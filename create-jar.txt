@@ -1,0 +1,3 @@
+mvn install:install-file -DgroupId=nachc-cad -DartifactId=nachc-cad-core -Dversion=1.0.4-001 -Dfile=/_WORKSPACES/_ECLIPSE_WORKSPACE/workspace/core/target/nachc-cad-core-1.0.4-001.jar -Dpackaging=jar -DgeneratePom=true -DlocalRepositoryPath=.  -DcreateChecksum=true
+
+git add -A . && git commit -m "Created jar file."
