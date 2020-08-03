@@ -1,0 +1,15 @@
+#
+# tag the version with something like this
+#
+
+git tag -a v1.0.1 -m "Initial release (v1.0.1)"
+
+
+
+
+
+
+
+
+
+
