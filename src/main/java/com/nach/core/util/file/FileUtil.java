@@ -87,4 +87,20 @@ public class FileUtil {
 			throw new RuntimeException(exp);
 		}
 	}
+	
+	public static File getProjectRoot() {
+		String filePath = "/";
+		String rootDirName = FileUtil.class.getResource(filePath).getPath();
+		File rtn = new File(rootDirName, "../../");
+		return rtn;
+	}
+
+	public static File getFile(String name) {
+		String filePath = "/";
+		String rootDirName = FileUtil.class.getResource(filePath).getPath();
+		File rtn = new File(rootDirName, "../../");
+		rtn = new File(rtn, name);
+		return rtn;
+	}
+
 }
