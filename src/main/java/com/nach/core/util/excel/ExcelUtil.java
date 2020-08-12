@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.nach.core.util.excel.enumeration.ExcelCellType;
 import com.nach.core.util.time.TimeUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -59,8 +60,11 @@ public class ExcelUtil {
 	}
 	
 	public static String getStringValue(Cell cell) {
+		if(cell == null) {
+			return null;
+		}
 		int cellType = cell.getCellType();
-		if(DateUtil.isCellDateFormatted(cell)) {
+		if(Cell.CELL_TYPE_NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
 			Date date =  cell.getDateCellValue();
 			String rtn = TimeUtil.getDateAsYyyyMmDd(date);
 			return rtn;
@@ -68,6 +72,17 @@ public class ExcelUtil {
 			return cell.getNumericCellValue() + "";
 		} else {
 			return cell.getStringCellValue();
+		}
+	}
+	
+	public static ExcelCellType getCellType(Cell cell) {
+		int cellType = cell.getCellType();
+		if(Cell.CELL_TYPE_NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
+			return ExcelCellType.DATE_TIME;
+		} else if(Cell.CELL_TYPE_NUMERIC == cellType) {
+			return ExcelCellType.NUMBER;
+		} else {
+			return ExcelCellType.STRING;
 		}
 	}
 	
