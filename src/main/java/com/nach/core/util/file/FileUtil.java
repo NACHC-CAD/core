@@ -4,6 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 public class FileUtil {
@@ -95,6 +99,12 @@ public class FileUtil {
 		return rtn;
 	}
 
+	public static File getFromProjectRoot(String fileName) {
+		File root = getProjectRoot();
+		File file = new File(root, fileName);
+		return file;
+	}
+	
 	public static File getFile(String name) {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
@@ -103,4 +113,11 @@ public class FileUtil {
 		return rtn;
 	}
 
+	public static List<File> list(File dir) {
+		File[] fileArray = dir.listFiles();
+		List<File> files = Arrays.asList(fileArray);
+		Collections.sort(files);
+		return files;
+	}
+	
 }
