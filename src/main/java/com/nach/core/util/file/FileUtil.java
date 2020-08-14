@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
@@ -114,9 +114,15 @@ public class FileUtil {
 	}
 
 	public static List<File> list(File dir) {
+		Comparator<File> comp = new Comparator<File>() {
+			@Override
+			public int compare(File file1, File file2) {
+				return file1.getName().compareTo(file2.getName());
+			}
+		};
 		File[] fileArray = dir.listFiles();
 		List<File> files = Arrays.asList(fileArray);
-		Collections.sort(files);
+		Collections.sort(files, comp);
 		return files;
 	}
 	
