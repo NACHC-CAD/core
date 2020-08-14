@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -122,8 +123,10 @@ public class FileUtil {
 		};
 		File[] fileArray = dir.listFiles();
 		List<File> files = Arrays.asList(fileArray);
+		ArrayList<File> rtn = new ArrayList<File>();
+		rtn.addAll(files);
 		Collections.sort(files, comp);
-		return files;
+		return rtn;
 	}
 	
 }
