@@ -2,6 +2,7 @@ package com.nach.core.util.file;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -104,6 +105,15 @@ public class FileUtil {
 		File root = getProjectRoot();
 		File file = new File(root, fileName);
 		return file;
+	}
+
+	public static InputStream getInputStreamFromProjectRoot(String fileName) {
+		try {
+			InputStream in = new FileInputStream(FileUtil.getFromProjectRoot(fileName));
+			return in;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
 	
 	public static File getFile(String name) {

@@ -30,18 +30,6 @@ public class ExcelUtil {
 		}
 	}
 	
-	public static Sheet getSheet(InputStream in, String sheetName) {
-		try {
-			Workbook book = getWorkbook(in);
-			log.debug("Getting sheet: " + sheetName);
-			Sheet sheet = book.getSheet(sheetName);
-			log.debug("Got sheet");
-			return sheet;
-		} catch(Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-	
 	public static Sheet getSheet(Workbook book, String name) {
 		try {
 			Sheet sheet = book.getSheet(name);
