@@ -39,6 +39,15 @@ public class ExcelUtil {
 		}
 	}
 	
+	public static Sheet getSheet(Workbook book, int index) {
+		try {
+			Sheet sheet = book.getSheetAt(index);
+			return sheet;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 	public static Iterator<Row> getRows(Sheet sheet) {
 		return sheet.iterator();
 	}

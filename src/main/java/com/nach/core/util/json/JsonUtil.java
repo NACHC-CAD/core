@@ -12,6 +12,18 @@ import com.nach.core.util.file.FileUtil;
 
 public class JsonUtil {
 
+	public static String getString(String json, String key) {
+		JSONObject obj = new JSONObject(json);
+		return obj.getString(key);
+	}
+	
+	public static List<String> getJsonArray(String json, String key) {
+		JSONObject obj = new JSONObject(json);
+		JSONArray array = obj.getJSONArray(key);
+		List<String> rtn = toArrayList(array);
+		return rtn;
+	}
+	
 	/**
 	 * Convert a json array to an array of Strings.
 	 */
@@ -37,7 +49,8 @@ public class JsonUtil {
 	 */
 	public static List<String> toArrayList(JSONArray jsonArray) {
 		ArrayList<String> rtn = new ArrayList<String>();
-		for (Object obj : jsonArray) {
+		for(int i=0;i<jsonArray.length();i++) {
+			Object obj = jsonArray.get(i);
 			if (obj instanceof JSONObject) {
 				JSONObject jsonObj = (JSONObject) obj;
 			}
