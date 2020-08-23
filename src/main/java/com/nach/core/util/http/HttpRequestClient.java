@@ -1,6 +1,7 @@
 package com.nach.core.util.http;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
@@ -190,10 +194,10 @@ public class HttpRequestClient {
 
 	public void doPostForm() {
 		try {
-			HttpPost request = new HttpPost(this.url);
-			this.addHeaders(request);
-			addFormParams(request);
-			HttpResponse response = this.client.execute(request);
+			HttpPost httpPost = new HttpPost(this.url);
+			this.addHeaders(httpPost);
+			addFormParams(httpPost);
+			HttpResponse response = this.client.execute(httpPost);
 			this.responseInputStream = response.getEntity().getContent();
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
@@ -201,12 +205,39 @@ public class HttpRequestClient {
 	}
 
 	//
+	// post file
+	//
+	
+	public void postFile(File file, String path) {
+		try {
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost(this.url);
+			httpPost.getParams().setParameter("path", path);
+			this.addFormParams(httpPost);
+			FileBody uploadFilePart = new FileBody(file);
+			MultipartEntity reqEntity = new MultipartEntity();
+			reqEntity.addPart("path", new StringBody(path));
+			this.addHeaders(httpPost);
+			reqEntity.addPart("upload-file", uploadFilePart);
+			httpPost.setEntity(reqEntity);
+			HttpResponse response = httpClient.execute(httpPost);
+			this.responseInputStream = response.getEntity().getContent();
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
+	//
 	// get response
 	//
 
 	public String getResponse() {
+		return getResponse(this.responseInputStream);
+	}
+	
+	public static String getResponse(InputStream in) {
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(this.responseInputStream));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			StringBuffer sb = new StringBuffer();
 			String line = "";
 			while ((line = reader.readLine()) != null) {
@@ -218,8 +249,8 @@ public class HttpRequestClient {
 			throw new RuntimeException(exp);
 		} finally {
 			try {
-				if (responseInputStream != null) {
-					this.responseInputStream.close();
+				if (in != null) {
+					in.close();
 				}
 			} catch (Exception exp) {
 				throw new RuntimeException(exp);
