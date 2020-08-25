@@ -12,6 +12,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.tools.ant.DirectoryScanner;
+
+
 public class FileUtil {
 
 	/**
@@ -93,7 +96,7 @@ public class FileUtil {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	public static File getProjectRoot() {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
@@ -111,11 +114,11 @@ public class FileUtil {
 		try {
 			InputStream in = new FileInputStream(FileUtil.getFromProjectRoot(fileName));
 			return in;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	public static File getFile(String name) {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
@@ -138,5 +141,33 @@ public class FileUtil {
 		Collections.sort(files, comp);
 		return rtn;
 	}
-	
+
+	public static List<File> listFiles(File file, String pattern) {
+		ArrayList<File> rtn = new ArrayList<File>();
+		DirectoryScanner scanner = new DirectoryScanner();
+		scanner.setIncludes(new String[] { pattern });
+		scanner.setBasedir(file);
+		scanner.setCaseSensitive(false);
+		scanner.scan();
+		String[] files = scanner.getIncludedFiles();
+		for(String str : files) {
+			rtn.add(new File(file, str));
+		}
+		return rtn;
+	}
+
+	public static List<File> listFiles(File file, String[] includes) {
+		ArrayList<File> rtn = new ArrayList<File>();
+		DirectoryScanner scanner = new DirectoryScanner();
+		scanner.setIncludes(includes);
+		scanner.setBasedir(file);
+		scanner.setCaseSensitive(false);
+		scanner.scan();
+		String[] files = scanner.getIncludedFiles();
+		for(String str : files) {
+			rtn.add(new File(file, str));
+		}
+		return rtn;
+	}
+
 }

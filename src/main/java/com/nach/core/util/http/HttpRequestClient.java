@@ -222,6 +222,7 @@ public class HttpRequestClient {
 			httpPost.setEntity(reqEntity);
 			HttpResponse response = httpClient.execute(httpPost);
 			this.responseInputStream = response.getEntity().getContent();
+			this.setStatusCode(response.getStatusLine().getStatusCode());
 		} catch(Exception exp) {
 			throw new RuntimeException(exp);
 		}
