@@ -37,7 +37,8 @@ public class ExcelUtil {
 			if(target.exists() == true) {
 				target.delete();
 			}
-			log.info("Creating file at: " + target.getCanonicalPath());
+			log.debug("Creating file at: " + target.getCanonicalPath());
+			target.getParentFile().mkdirs();
 			target.createNewFile();
 			Writer writer = Files.newBufferedWriter(target.toPath());
 			csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
@@ -158,4 +159,13 @@ public class ExcelUtil {
 		}
 	}
 
+	public static void addCol(Row row, String val, int cnt) {
+		Cell cell = row.createCell(cnt);
+		cell.setCellValue(val);
+	}
+
+	public static Row createNextRow(Sheet sheet) {
+		return sheet.createRow(sheet.getLastRowNum() + 1);
+	}
+	
 }
