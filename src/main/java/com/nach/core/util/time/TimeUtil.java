@@ -35,5 +35,12 @@ public class TimeUtil {
 		String rtn = getDateAsYyyyMmDd(date);
 		return rtn;
 	}
+
+	public static String getTimeString(long timeStamp) {
+		Date date = new Date(timeStamp);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd 'at' HH:mm:ss z");
+		String rtn = format.format(date);
+		return rtn;
+	}
 	
 }

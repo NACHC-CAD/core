@@ -1,6 +1,7 @@
 package com.nach.core.util.time;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class Timer {
 
@@ -23,6 +24,14 @@ public class Timer {
 	public double getElapsed() {
 		double elapsed = ((double)getElapsedInMilliseconds()) / 1000L;
 		return elapsed;
+	}
+	
+	public long getStart() {
+		return this.start;
+	}
+	
+	public long getStop() {
+		return this.stop;
 	}
 	
 }
