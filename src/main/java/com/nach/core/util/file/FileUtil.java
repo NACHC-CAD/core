@@ -169,5 +169,9 @@ public class FileUtil {
 		}
 		return rtn;
 	}
+	
+	public static long size(File file) {
+		return file.length();
+	}
 
 }
