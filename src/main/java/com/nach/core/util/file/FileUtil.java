@@ -12,6 +12,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
 
@@ -174,4 +175,28 @@ public class FileUtil {
 		return file.length();
 	}
 
+	public static void rmdir(File dir) {
+		try {
+			FileUtils.forceDelete(dir);
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
+	public static void clearContents(File dir) {
+		if(dir.exists()) {
+			return;
+		}
+		rmdir(dir);
+		if(dir.exists() == true) {
+			throw new RuntimeException("Dir not deleted: " + dir);
+		}
+		dir.mkdir();
+		if(dir.exists() == false) {
+			throw new RuntimeException("Could not create directory: " + dir);
+		}
+	}
+	
 }
+
+
