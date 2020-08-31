@@ -197,6 +197,15 @@ public class FileUtil {
 		}
 	}
 	
+	public static String getCanonicalPath(File file) {
+		try {
+			return file.getCanonicalPath();
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+		
+	}
+	
 }
 
 
