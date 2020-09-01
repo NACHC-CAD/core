@@ -8,14 +8,18 @@ import java.nio.file.Files;
 import java.util.Date;
 import java.util.Iterator;
 
+import javax.swing.text.html.HTML;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tools.ant.taskdefs.Javadoc.Html;
 
 import com.nach.core.util.excel.enumeration.ExcelCellType;
 import com.nach.core.util.time.TimeUtil;
@@ -138,7 +142,10 @@ public class ExcelUtil {
 		} else if (Cell.CELL_TYPE_NUMERIC == cellType) {
 			return cell.getNumericCellValue() + "";
 		} else {
-			return cell.getStringCellValue();
+			String rtn = cell.getStringCellValue();
+			rtn = StringEscapeUtils.escapeHtml4(rtn);
+			rtn = rtn.replace("\n", "&NewLine;");
+			return rtn;
 		}
 	}
 

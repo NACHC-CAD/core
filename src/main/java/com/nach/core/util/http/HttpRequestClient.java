@@ -2,8 +2,10 @@ package com.nach.core.util.http;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -124,7 +126,7 @@ public class HttpRequestClient {
 
 	public void addHeaders(Properties props) {
 		Enumeration<Object> keys = props.keys();
-		while(keys.hasMoreElements()) {
+		while (keys.hasMoreElements()) {
 			String key = keys.nextElement() + "";
 			String val = props.getProperty(key);
 			this.addHeader(key, val);
@@ -207,7 +209,7 @@ public class HttpRequestClient {
 	//
 	// post file
 	//
-	
+
 	public void postFile(File file, String path) {
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
@@ -223,11 +225,11 @@ public class HttpRequestClient {
 			HttpResponse response = httpClient.execute(httpPost);
 			this.responseInputStream = response.getEntity().getContent();
 			this.setStatusCode(response.getStatusLine().getStatusCode());
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	//
 	// get response
 	//
@@ -235,7 +237,7 @@ public class HttpRequestClient {
 	public String getResponse() {
 		return getResponse(this.responseInputStream);
 	}
-	
+
 	public static String getResponse(InputStream in) {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
@@ -279,6 +281,32 @@ public class HttpRequestClient {
 			post.setEntity(entity);
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
+		}
+	}
+
+	public void writeResponseToFile(File file) {
+		InputStream is = null;
+		OutputStream os = null;
+		try {
+			is = this.responseInputStream;
+			os = new FileOutputStream(file);
+			int inByte;
+			while ((inByte = is.read()) != -1) {
+				os.write(inByte);
+			}
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		} finally {
+			try {
+				if (is != null) {
+					is.close();
+				}
+				if (os != null) {
+					os.close();
+				}
+			} catch (Exception exp) {
+				throw new RuntimeException(exp);
+			}
 		}
 	}
 

@@ -206,6 +206,13 @@ public class FileUtil {
 		
 	}
 	
+	public static void createNewFile(File file) {
+		try {
+			file.createNewFile();
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
 }
 
 
