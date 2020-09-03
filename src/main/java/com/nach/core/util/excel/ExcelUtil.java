@@ -151,7 +151,13 @@ public class ExcelUtil {
 
 	public static void setStringValue(Sheet sheet, String val, int r, int c) {
 		Row row = sheet.getRow(r);
+		if(row == null) {
+			row = sheet.createRow(r);
+		}
 		Cell cell = row.getCell(c);
+		if(cell == null) {
+			cell = row.createCell(c);
+		}
 		cell.setCellValue(val);
 	}
 	

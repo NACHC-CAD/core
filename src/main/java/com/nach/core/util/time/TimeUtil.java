@@ -25,7 +25,7 @@ public class TimeUtil {
 	}
 
 	public static String getDateAsYyyyMmDd(Date date) {
-		SimpleDateFormat format = new SimpleDateFormat("yyyymmdd");
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		String rtn = format.format(date);
 		return rtn;
 	}
