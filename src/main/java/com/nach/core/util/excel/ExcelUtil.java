@@ -8,18 +8,17 @@ import java.nio.file.Files;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.swing.text.html.HTML;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.tools.ant.taskdefs.Javadoc.Html;
 
 import com.nach.core.util.excel.enumeration.ExcelCellType;
 import com.nach.core.util.time.TimeUtil;
@@ -30,15 +29,19 @@ import lombok.extern.slf4j.Slf4j;
 public class ExcelUtil {
 
 	public static Workbook createNewWorkbook() {
-		XSSFWorkbook book = new XSSFWorkbook();
-		return book;
+		try {
+			XSSFWorkbook book = new XSSFWorkbook();
+			return book;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
 
 	public static void saveAsCsv(Sheet sheet, File target) {
 		CSVPrinter csvPrinter = null;
 		try {
 			// create the csvPrinter
-			if(target.exists() == true) {
+			if (target.exists() == true) {
 				target.delete();
 			}
 			log.debug("Creating file at: " + target.getCanonicalPath());
@@ -62,11 +65,11 @@ public class ExcelUtil {
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		} finally {
-			if(csvPrinter != null) {
+			if (csvPrinter != null) {
 				try {
 					csvPrinter.close();
-				} catch(Exception exp) {
-					throw new RuntimeException (exp);
+				} catch (Exception exp) {
+					throw new RuntimeException(exp);
 				}
 			}
 		}
@@ -120,26 +123,26 @@ public class ExcelUtil {
 
 	public static String getStringValue(Sheet sheet, int r, int c) {
 		Row row = sheet.getRow(r);
-		if(row == null) {
+		if (row == null) {
 			return null;
 		}
 		Cell cell = row.getCell(c);
-		if(cell == null) {
+		if (cell == null) {
 			return null;
 		}
 		return getStringValue(cell);
 	}
-	
+
 	public static String getStringValue(Cell cell) {
 		if (cell == null) {
 			return null;
 		}
-		int cellType = cell.getCellType();
-		if (Cell.CELL_TYPE_NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
+		CellType cellType = cell.getCellType();
+		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
 			Date date = cell.getDateCellValue();
 			String rtn = TimeUtil.getDateAsYyyyMmDd(date);
 			return rtn;
-		} else if (Cell.CELL_TYPE_NUMERIC == cellType) {
+		} else if (CellType.NUMERIC == cellType) {
 			return cell.getNumericCellValue() + "";
 		} else {
 			String rtn = cell.getStringCellValue();
@@ -151,21 +154,21 @@ public class ExcelUtil {
 
 	public static void setStringValue(Sheet sheet, String val, int r, int c) {
 		Row row = sheet.getRow(r);
-		if(row == null) {
+		if (row == null) {
 			row = sheet.createRow(r);
 		}
 		Cell cell = row.getCell(c);
-		if(cell == null) {
+		if (cell == null) {
 			cell = row.createCell(c);
 		}
 		cell.setCellValue(val);
 	}
-	
+
 	public static ExcelCellType getCellType(Cell cell) {
-		int cellType = cell.getCellType();
-		if (Cell.CELL_TYPE_NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
+		CellType cellType = cell.getCellType();
+		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
 			return ExcelCellType.DATE_TIME;
-		} else if (Cell.CELL_TYPE_NUMERIC == cellType) {
+		} else if (CellType.NUMERIC == cellType) {
 			return ExcelCellType.NUMBER;
 		} else {
 			return ExcelCellType.STRING;
@@ -180,5 +183,5 @@ public class ExcelUtil {
 	public static Row createNextRow(Sheet sheet) {
 		return sheet.createRow(sheet.getLastRowNum() + 1);
 	}
-		
+
 }
