@@ -20,6 +20,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.nach.core.util.excel.enumeration.ExcelCellType;
+import com.nach.core.util.string.escape.Escape;
 import com.nach.core.util.time.TimeUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ExcelUtil {
 
+	//
+	// workbook methods
+	//
+	
+	/**
+	 * 
+	 * Create a new workbook in memory (no file is created).  
+	 * 
+	 */
 	public static Workbook createNewWorkbook() {
 		try {
 			XSSFWorkbook book = new XSSFWorkbook();
@@ -36,12 +46,212 @@ public class ExcelUtil {
 		}
 	}
 
+	/**
+	 * 
+	 * Create a workbook object in memeory for the given file.  
+	 * 
+	 */
+	public static Workbook getWorkbook(File file) {
+		try {
+			FileInputStream in = new FileInputStream(file);
+			return getWorkbook(in);
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	/**
+	 * 
+	 * Create a workbook object in memeory for the given input stream.  
+	 * 
+	 */
+	public static Workbook getWorkbook(InputStream in) {
+		try {
+			log.debug("Getting workbook (this might take a while)...");
+			Workbook book = new XSSFWorkbook(in);
+			log.debug("Got workbook");
+			return book;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	//
+	// spreadsheet methods
+	//
+	
+	public static Sheet getSheet(Workbook book, String name) {
+		try {
+			Sheet sheet = book.getSheet(name);
+			return sheet;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	public static Sheet getSheet(Workbook book, int index) {
+		try {
+			Sheet sheet = book.getSheetAt(index);
+			return sheet;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	//
+	// row and col methods
+	//
+	
+	public static Iterator<Row> getRows(Sheet sheet) {
+		return sheet.iterator();
+	}
+
+	public static Iterator<Cell> getCells(Row row) {
+		return row.cellIterator();
+	}
+
+	//
+	// cell type method
+	//
+	
+	/**
+	 * 
+	 * Method to get the type of a cell.  
+	 * 
+	 */
+	public static ExcelCellType getCellType(Cell cell) {
+		CellType cellType = cell.getCellType();
+		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
+			return ExcelCellType.DATE_TIME;
+		} else if (CellType.NUMERIC == cellType) {
+			return ExcelCellType.NUMBER;
+		} else {
+			return ExcelCellType.STRING;
+		}
+	}
+
+	//
+	// methods to get the value of a cell
+	//
+	
+	/**
+	 * 
+	 * Get the value of a cell for the given cell.  
+	 * 
+	 */
+
+	public static String getStringValue(Cell cell) {
+		return getStringValue(cell, null);
+	}
+	
+	public static String getStringValue(Cell cell, Escape escape) {
+		if (cell == null) {
+			return null;
+		}
+		CellType cellType = cell.getCellTypeEnum();
+		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
+			Date date = cell.getDateCellValue();
+			String rtn = TimeUtil.getDateAsYyyyMmDd(date);
+			return rtn;
+		} else if (CellType.NUMERIC == cellType) {
+			return cell.getNumericCellValue() + "";
+		} else {
+			String rtn = cell.getStringCellValue();
+			if(escape != null) {
+				rtn = escape.escape(rtn);
+			}
+			return rtn;
+		}
+	}
+
+	/**
+	 * 
+	 * Get the value of a cell for the given sheet, row, and column.  
+	 * 
+	 */
+	public static String getStringValue(Sheet sheet, int r, int c) {
+		Row row = sheet.getRow(r);
+		if (row == null) {
+			return null;
+		}
+		Cell cell = row.getCell(c);
+		if (cell == null) {
+			return null;
+		}
+		return getStringValue(cell);
+	}
+
+	/**
+	 * 
+	 * Get the value of a cell for the given row, and column.  
+	 * 
+	 */
+	public static String getStringValue(Row row, int c) {
+		if (row == null) {
+			return null;
+		}
+		Cell cell = row.getCell(c);
+		if (cell == null) {
+			return null;
+		}
+		return getStringValue(cell);
+	}
+
+	//
+	// methods to set the value of a cell
+	//
+	
+	/**
+	 * 
+	 * Set the value of a cell for the given sheet, row, and column.  
+	 * 
+	 */
+	public static void setStringValue(Sheet sheet, String val, int r, int c) {
+		Row row = sheet.getRow(r);
+		if (row == null) {
+			row = sheet.createRow(r);
+		}
+		Cell cell = row.getCell(c);
+		if (cell == null) {
+			cell = row.createCell(c);
+		}
+		cell.setCellValue(val);
+	}
+
+	//
+	// methods to add col/row
+	//
+	
+	public static void addCol(Row row, String val, int cnt) {
+		Cell cell = row.createCell(cnt);
+		cell.setCellValue(val);
+	}
+
+	public static Row createNextRow(Sheet sheet) {
+		return sheet.createRow(sheet.getLastRowNum() + 1);
+	}
+
+	//
+	// persistence methods
+	//
+	
+	/**
+	 * 
+	 * Write a spreadsheet to a csv file.  
+	 * If the file exists it will be over written.  
+	 * If the dir does not exist it will be created.  
+	 * 
+	 */
 	public static void saveAsCsv(Sheet sheet, File target) {
 		CSVPrinter csvPrinter = null;
 		try {
 			// create the csvPrinter
 			if (target.exists() == true) {
 				target.delete();
+			}
+			// create the dir if it doesn't exist
+			if(target.getParentFile().exists() == false) {
+				target.getParentFile().mkdirs();
 			}
 			log.debug("Creating file at: " + target.getCanonicalPath());
 			target.getParentFile().mkdirs();
@@ -72,126 +282,6 @@ public class ExcelUtil {
 				}
 			}
 		}
-	}
-
-	public static Workbook getWorkbook(File file) {
-		try {
-			FileInputStream in = new FileInputStream(file);
-			return getWorkbook(in);
-		} catch (Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-
-	public static Workbook getWorkbook(InputStream in) {
-		try {
-			log.debug("Getting workbook (this might take a while)...");
-			Workbook book = new XSSFWorkbook(in);
-			log.debug("Got workbook");
-			return book;
-		} catch (Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-
-	public static Sheet getSheet(Workbook book, String name) {
-		try {
-			Sheet sheet = book.getSheet(name);
-			return sheet;
-		} catch (Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-
-	public static Sheet getSheet(Workbook book, int index) {
-		try {
-			Sheet sheet = book.getSheetAt(index);
-			return sheet;
-		} catch (Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-
-	public static Iterator<Row> getRows(Sheet sheet) {
-		return sheet.iterator();
-	}
-
-	public static Iterator<Cell> getCells(Row row) {
-		return row.cellIterator();
-	}
-
-	public static String getStringValue(Sheet sheet, int r, int c) {
-		Row row = sheet.getRow(r);
-		if (row == null) {
-			return null;
-		}
-		Cell cell = row.getCell(c);
-		if (cell == null) {
-			return null;
-		}
-		return getStringValue(cell);
-	}
-
-	public static String getStringValue(Row row, int c) {
-		if (row == null) {
-			return null;
-		}
-		Cell cell = row.getCell(c);
-		if (cell == null) {
-			return null;
-		}
-		return getStringValue(cell);
-	}
-
-	public static String getStringValue(Cell cell) {
-		if (cell == null) {
-			return null;
-		}
-		CellType cellType = cell.getCellTypeEnum();
-		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
-			Date date = cell.getDateCellValue();
-			String rtn = TimeUtil.getDateAsYyyyMmDd(date);
-			return rtn;
-		} else if (CellType.NUMERIC == cellType) {
-			return cell.getNumericCellValue() + "";
-		} else {
-			String rtn = cell.getStringCellValue();
-			rtn = StringEscapeUtils.escapeHtml4(rtn);
-			rtn = rtn.replace("\n", "&NewLine;");
-			return rtn;
-		}
-	}
-
-	public static void setStringValue(Sheet sheet, String val, int r, int c) {
-		Row row = sheet.getRow(r);
-		if (row == null) {
-			row = sheet.createRow(r);
-		}
-		Cell cell = row.getCell(c);
-		if (cell == null) {
-			cell = row.createCell(c);
-		}
-		cell.setCellValue(val);
-	}
-
-	public static ExcelCellType getCellType(Cell cell) {
-		CellType cellType = cell.getCellType();
-		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
-			return ExcelCellType.DATE_TIME;
-		} else if (CellType.NUMERIC == cellType) {
-			return ExcelCellType.NUMBER;
-		} else {
-			return ExcelCellType.STRING;
-		}
-	}
-
-	public static void addCol(Row row, String val, int cnt) {
-		Cell cell = row.createCell(cnt);
-		cell.setCellValue(val);
-	}
-
-	public static Row createNextRow(Sheet sheet) {
-		return sheet.createRow(sheet.getLastRowNum() + 1);
 	}
 
 }
