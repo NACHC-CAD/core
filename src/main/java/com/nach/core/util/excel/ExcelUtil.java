@@ -17,7 +17,6 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.nach.core.util.excel.enumeration.ExcelCellType;
@@ -133,11 +132,22 @@ public class ExcelUtil {
 		return getStringValue(cell);
 	}
 
+	public static String getStringValue(Row row, int c) {
+		if (row == null) {
+			return null;
+		}
+		Cell cell = row.getCell(c);
+		if (cell == null) {
+			return null;
+		}
+		return getStringValue(cell);
+	}
+
 	public static String getStringValue(Cell cell) {
 		if (cell == null) {
 			return null;
 		}
-		CellType cellType = cell.getCellType();
+		CellType cellType = cell.getCellTypeEnum();
 		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
 			Date date = cell.getDateCellValue();
 			String rtn = TimeUtil.getDateAsYyyyMmDd(date);

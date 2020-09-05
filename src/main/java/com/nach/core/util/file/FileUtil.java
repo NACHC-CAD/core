@@ -123,8 +123,7 @@ public class FileUtil {
 	public static File getFile(String name) {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
-		File rtn = new File(rootDirName, "../../");
-		rtn = new File(rtn, name);
+		File rtn = new File(rootDirName, name);
 		return rtn;
 	}
 
