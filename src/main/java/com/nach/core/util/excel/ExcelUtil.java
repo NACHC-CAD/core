@@ -2,7 +2,9 @@ package com.nach.core.util.excel;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.util.Date;
@@ -10,16 +12,19 @@ import java.util.Iterator;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.monitorjbl.xlsx.StreamingReader;
 import com.nach.core.util.excel.enumeration.ExcelCellType;
+import com.nach.core.util.file.FileUtil;
 import com.nach.core.util.string.escape.Escape;
 import com.nach.core.util.time.TimeUtil;
 
@@ -31,15 +36,15 @@ public class ExcelUtil {
 	//
 	// workbook methods
 	//
-	
+
 	/**
 	 * 
-	 * Create a new workbook in memory (no file is created).  
+	 * Create a new workbook in memory (no file is created).
 	 * 
 	 */
 	public static Workbook createNewWorkbook() {
 		try {
-			XSSFWorkbook book = new XSSFWorkbook();
+			SXSSFWorkbook book = new SXSSFWorkbook();
 			return book;
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
@@ -48,21 +53,42 @@ public class ExcelUtil {
 
 	/**
 	 * 
-	 * Create a workbook object in memeory for the given file.  
+	 * Create a workbook object in memeory for the given file.
 	 * 
 	 */
 	public static Workbook getWorkbook(File file) {
 		try {
-			FileInputStream in = new FileInputStream(file);
-			return getWorkbook(in);
+			Workbook book = WorkbookFactory.create(file);
+			return book;
+			// FileInputStream in = new FileInputStream(file);
+			// return getWorkbook(in);
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
 
+	public static StreamingReader getReader(File file) {
+		return getReader(file, 0);
+	}
+
+	
+	public static StreamingReader getReader(File file, int sheetIndex) {
+		try {
+			InputStream in = new FileInputStream(file);
+			StreamingReader reader = StreamingReader.builder()
+			        .rowCacheSize(100)      // number of rows to keep in memory (defaults to 10)
+			        .bufferSize(4096)       // buffer size to use when reading InputStream to file (defaults to 1024)
+			        .sheetIndex(sheetIndex) // index of sheet to use
+			        .read(in);              // read the file
+			return reader;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 	/**
 	 * 
-	 * Create a workbook object in memeory for the given input stream.  
+	 * Create a workbook object in memeory for the given input stream.
 	 * 
 	 */
 	public static Workbook getWorkbook(InputStream in) {
@@ -79,7 +105,7 @@ public class ExcelUtil {
 	//
 	// spreadsheet methods
 	//
-	
+
 	public static Sheet getSheet(Workbook book, String name) {
 		try {
 			Sheet sheet = book.getSheet(name);
@@ -101,7 +127,7 @@ public class ExcelUtil {
 	//
 	// row and col methods
 	//
-	
+
 	public static Iterator<Row> getRows(Sheet sheet) {
 		return sheet.iterator();
 	}
@@ -113,10 +139,10 @@ public class ExcelUtil {
 	//
 	// cell type method
 	//
-	
+
 	/**
 	 * 
-	 * Method to get the type of a cell.  
+	 * Method to get the type of a cell.
 	 * 
 	 */
 	public static ExcelCellType getCellType(Cell cell) {
@@ -133,17 +159,17 @@ public class ExcelUtil {
 	//
 	// methods to get the value of a cell
 	//
-	
+
 	/**
 	 * 
-	 * Get the value of a cell for the given cell.  
+	 * Get the value of a cell for the given cell.
 	 * 
 	 */
 
 	public static String getStringValue(Cell cell) {
 		return getStringValue(cell, null);
 	}
-	
+
 	public static String getStringValue(Cell cell, Escape escape) {
 		if (cell == null) {
 			return null;
@@ -157,7 +183,7 @@ public class ExcelUtil {
 			return cell.getNumericCellValue() + "";
 		} else {
 			String rtn = cell.getStringCellValue();
-			if(escape != null) {
+			if (escape != null) {
 				rtn = escape.escape(rtn);
 			}
 			return rtn;
@@ -166,7 +192,7 @@ public class ExcelUtil {
 
 	/**
 	 * 
-	 * Get the value of a cell for the given sheet, row, and column.  
+	 * Get the value of a cell for the given sheet, row, and column.
 	 * 
 	 */
 	public static String getStringValue(Sheet sheet, int r, int c) {
@@ -183,7 +209,7 @@ public class ExcelUtil {
 
 	/**
 	 * 
-	 * Get the value of a cell for the given row, and column.  
+	 * Get the value of a cell for the given row, and column.
 	 * 
 	 */
 	public static String getStringValue(Row row, int c) {
@@ -200,10 +226,10 @@ public class ExcelUtil {
 	//
 	// methods to set the value of a cell
 	//
-	
+
 	/**
 	 * 
-	 * Set the value of a cell for the given sheet, row, and column.  
+	 * Set the value of a cell for the given sheet, row, and column.
 	 * 
 	 */
 	public static void setStringValue(Sheet sheet, String val, int r, int c) {
@@ -218,13 +244,23 @@ public class ExcelUtil {
 		cell.setCellValue(val);
 	}
 
+	public static void addCol(Row row, String val) {
+		int col = row.getLastCellNum() + 1;
+		Cell cell = row.createCell(col);
+		cell.setCellValue(val);
+	}
+
 	//
 	// methods to add col/row
 	//
-	
+
 	public static void addCol(Row row, String val, int cnt) {
 		Cell cell = row.createCell(cnt);
 		cell.setCellValue(val);
+	}
+
+	public static Row addRow(Sheet sheet) {
+		return createNextRow(sheet);
 	}
 
 	public static Row createNextRow(Sheet sheet) {
@@ -234,12 +270,11 @@ public class ExcelUtil {
 	//
 	// persistence methods
 	//
-	
+
 	/**
 	 * 
-	 * Write a spreadsheet to a csv file.  
-	 * If the file exists it will be over written.  
-	 * If the dir does not exist it will be created.  
+	 * Write a spreadsheet to a csv file. If the file exists it will be over
+	 * written. If the dir does not exist it will be created.
 	 * 
 	 */
 	public static void saveAsCsv(Sheet sheet, File target) {
@@ -250,7 +285,7 @@ public class ExcelUtil {
 				target.delete();
 			}
 			// create the dir if it doesn't exist
-			if(target.getParentFile().exists() == false) {
+			if (target.getParentFile().exists() == false) {
 				target.getParentFile().mkdirs();
 			}
 			log.debug("Creating file at: " + target.getCanonicalPath());
@@ -284,4 +319,52 @@ public class ExcelUtil {
 		}
 	}
 
+	public static void save(Workbook book, File file) {
+		OutputStream out = null;
+		try {
+			log.info(file.getCanonicalPath());
+			log.info("Checking for existing file");
+			if (file.exists() == true) {
+				log.info("Deleting existing file: " + file.getCanonicalPath());
+				file.delete();
+			}
+			log.info("Checking for parent dir");
+			if (file.getParentFile().exists() == false) {
+				log.info("Creating dir: " + file.getParentFile().getCanonicalPath());
+				file.getParentFile().mkdir();
+			}
+			log.info("Getting output stream");
+			out = new FileOutputStream(file);
+			log.info("Writing file");
+			book.write(out);
+			log.info("Done with write");
+			out.flush();
+			log.info("Done with flush");
+		} catch (Throwable exp) {
+			exp.printStackTrace();
+			throw new RuntimeException(exp);
+		} finally {
+			close(book);
+			if(out != null) {
+				log.info("Closing");
+				FileUtil.close(out);
+				log.info("Done with close");
+			}
+		}
+	}
+
+	public static void close(Workbook book) {
+		try {
+			log.info("Closing workbook.");
+			book.close();
+			if(book instanceof SXSSFWorkbook) {
+				log.info("Doing dispose");
+				((SXSSFWorkbook)book).dispose();
+			}
+			log.info("Done with close");
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 }

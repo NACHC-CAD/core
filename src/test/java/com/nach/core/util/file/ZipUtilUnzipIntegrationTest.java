@@ -17,7 +17,7 @@ public class ZipUtilUnzipIntegrationTest {
 
 	private static final String UNZIPPED_DIR_NAME = DIR + "/unzipped";
 
-	private static final String TARGET_CSV = DIR + "/unzipped/large-file-for-excel-test.csv";
+	private static final String TARGET_CSV = DIR + "/unzipped/large-file-for-excel-test.xlsx";
 	
 	@Test
 	public void shouldParseToCsvFile() throws Exception {

@@ -16,13 +16,13 @@ import com.nach.core.util.file.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ExcelUtilIntegrationTest {
+public class ExcelUtilReadExcelIntegrationTest {
 
 	private static final String DIR = "/com/nach/core/testfiles/excel";
 
 	private static final String SRC_FILE_NAME = DIR + "/medium-file-for-excel-test.xlsx";
 
-	private static final String TARGET_CSV = DIR + "/csv/medium-file-for-excel-test.csv";
+	private static final String TARGET_CSV = DIR + "output/csv/medium-file-for-excel-test.csv";
 
 	@Test
 	public void shouldParseFile() {
