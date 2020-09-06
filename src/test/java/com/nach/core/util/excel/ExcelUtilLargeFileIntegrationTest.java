@@ -135,9 +135,7 @@ public class ExcelUtilLargeFileIntegrationTest {
 			}
 			if (cnt <= 1000 && cnt % 100 == 0) {
 				log.info(cnt + " \t" + rowAsString);
-			} else if (cnt <= 10000 && cnt % 1000 == 0) {
-				log.info(cnt + " \t" + rowAsString);
-			} else if (cnt % 10000 == 0) {
+			} else if (cnt % 1000 == 0) {
 				log.info(cnt + " \t" + rowAsString);
 			}
 			cnt++;
