@@ -11,6 +11,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Test;
 
+import com.monitorjbl.xlsx.StreamingReader;
 import com.nach.core.util.file.FileUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,25 +31,26 @@ public class ExcelUtilReadExcelIntegrationTest {
 		File file = FileUtil.getFile(SRC_FILE_NAME);
 		log.info("Using file: " + FileUtil.getCanonicalPath(file));
 		assertTrue(file.exists());
-		parseFile(file);
+		readFile(file);
 		log.info("Done.");
 	}
 
-	private void parseFile(File file) {
+	private void readFile(File file) {
 		Workbook book = ExcelUtil.getWorkbook(file);
 		Sheet sheet = book.getSheetAt(0);
 		Iterator<Row> rows = ExcelUtil.getRows(sheet);
-		while(rows.hasNext()) {
+		while (rows.hasNext()) {
 			Row row = rows.next();
 			Iterator<Cell> cells = row.iterator();
 			String rowAsString = "";
-			while(cells.hasNext()) {
+			while (cells.hasNext()) {
 				Cell cell = cells.next();
 				String str = ExcelUtil.getStringValue(cell);
 				rowAsString += str + "\t";
 			}
 			log.info(rowAsString);
+			assertTrue(rowAsString.length() > 10);
 		}
 	}
-	
+
 }

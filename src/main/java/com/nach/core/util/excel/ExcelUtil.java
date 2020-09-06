@@ -20,9 +20,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import com.monitorjbl.xlsx.StreamingReader;
+import com.monitorjbl.xlsx.impl.StreamingCell;
 import com.nach.core.util.excel.enumeration.ExcelCellType;
 import com.nach.core.util.file.FileUtil;
 import com.nach.core.util.string.escape.Escape;
@@ -170,11 +172,12 @@ public class ExcelUtil {
 		return getStringValue(cell, null);
 	}
 
+
 	public static String getStringValue(Cell cell, Escape escape) {
 		if (cell == null) {
 			return null;
 		}
-		CellType cellType = cell.getCellTypeEnum();
+		CellType cellType = cell.getCellType();
 		if (CellType.NUMERIC == cellType && DateUtil.isCellDateFormatted(cell)) {
 			Date date = cell.getDateCellValue();
 			String rtn = TimeUtil.getDateAsYyyyMmDd(date);
@@ -183,7 +186,7 @@ public class ExcelUtil {
 			return cell.getNumericCellValue() + "";
 		} else {
 			String rtn = cell.getStringCellValue();
-			if (escape != null) {
+			if(escape != null) {
 				rtn = escape.escape(rtn);
 			}
 			return rtn;
@@ -245,7 +248,10 @@ public class ExcelUtil {
 	}
 
 	public static void addCol(Row row, String val) {
-		int col = row.getLastCellNum() + 1;
+		int col = row.getLastCellNum();
+		if(col < 0) {
+			col = 0;
+		}
 		Cell cell = row.createCell(col);
 		cell.setCellValue(val);
 	}

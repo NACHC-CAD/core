@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
 import java.util.StringTokenizer;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -41,7 +40,7 @@ public class ExcelUtilLargeFileIntegrationTest {
 		File csvFile = getCsvFile();
 		File excelFile = writeCsvToExcel(csvFile);
 		log.info("Done with csv to excel, doing excel to csv...");
-		parseFile(excelFile);
+		readExcelFile(excelFile);
 		log.info("Done with excel to csv.");
 		log.info("Done.");
 	}
@@ -54,6 +53,7 @@ public class ExcelUtilLargeFileIntegrationTest {
 			log.info("Getting source file");
 			InputStream in = new FileInputStream(csvFile);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+			log.info("* * * THIS IS THE CSV VERSION (IT IS MUCH FASTER THAN THE EXCEL VERSION * * *");
 			log.info("Reading file...");
 			int cnt = 0;
 			String str = reader.readLine();
@@ -92,21 +92,44 @@ public class ExcelUtilLargeFileIntegrationTest {
 		return targetFile;
 	}
 
-	private void parseFile(File file) {
+	private void readExcelFileXXX(File file) {
+		Workbook book = ExcelUtil.getWorkbook(file);
+		Sheet sheet = book.getSheetAt(0);
+		int cnt = 0;
+		for (int r = 0; r < sheet.getLastRowNum(); r++) {
+			Row row = sheet.getRow(r);
+			String rowAsString = "";
+			for (int c = 0; c < row.getLastCellNum(); c++) {
+				if (rowAsString != "") {
+					rowAsString += ",";
+				}
+				rowAsString += ExcelUtil.getStringValue(row, c);
+			}
+			if (cnt < 100) {
+				log.info(cnt + " \t" + rowAsString);
+			} else if (cnt <= 1000 && cnt % 100 == 0) {
+				log.info(cnt + " \t" + rowAsString);
+			} else if (cnt <= 10000 && cnt % 1000 == 0) {
+				log.info(cnt + " \t" + rowAsString);
+			} else if (cnt % 10000 == 0) {
+				log.info(cnt + " \t" + rowAsString);
+			}
+			cnt++;
+		}
+	}
+
+	private void readExcelFile(File file) {
 		log.info("Parsing excel");
 		log.info("Reading file: " + FileUtil.getCanonicalPath(file));
 		StreamingReader reader = ExcelUtil.getReader(file);
 		log.info("Getting rows");
-		Iterator<Row> rows = reader.iterator();
 		int cnt = 0;
 		String rowAsString = "";
+		log.info("* * * THIS IS THE EXCEL READ (IT IS SLOWER THAN THE CSV READ) * * *");
 		log.info("Processing rows...");
-		while (rows.hasNext()) {
-			Row row = rows.next();
-			Iterator<Cell> cells = row.iterator();
+		for (Row row : reader) {
 			rowAsString = "";
-			while (cells.hasNext()) {
-				Cell cell = cells.next();
+			for (Cell cell : row) {
 				String str = ExcelUtil.getStringValue(cell);
 				rowAsString += str + "\t";
 			}
