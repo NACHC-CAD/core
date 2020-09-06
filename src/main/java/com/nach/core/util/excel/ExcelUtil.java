@@ -341,7 +341,7 @@ public class ExcelUtil {
 			}
 			log.info("Getting output stream");
 			out = new FileOutputStream(file);
-			log.info("Writing file");
+			log.info("Writing file (this takes a little bit of time)...");
 			book.write(out);
 			log.info("Done with write");
 			out.flush();
