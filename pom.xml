@@ -28,6 +28,13 @@
             <scope>provided</scope>
         </dependency>
 
+		<!-- YAORMA FRAMEWORK STUFF -->
+		<dependency>
+			<groupId>com.nachc.cad.tools</groupId>
+			<artifactId>yaorma</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	
 		<!-- JUNIT https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>

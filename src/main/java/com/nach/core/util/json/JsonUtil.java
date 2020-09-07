@@ -13,17 +13,25 @@ import com.nach.core.util.file.FileUtil;
 public class JsonUtil {
 
 	public static String getString(String json, String key) {
-		JSONObject obj = new JSONObject(json);
-		return obj.getString(key);
+		try {
+			JSONObject obj = new JSONObject(json);
+			return obj.getString(key);
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
-	
+
 	public static List<String> getJsonArray(String json, String key) {
-		JSONObject obj = new JSONObject(json);
-		JSONArray array = obj.getJSONArray(key);
-		List<String> rtn = toArrayList(array);
-		return rtn;
+		try {
+			JSONObject obj = new JSONObject(json);
+			JSONArray array = obj.getJSONArray(key);
+			List<String> rtn = toArrayList(array);
+			return rtn;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
-	
+
 	/**
 	 * Convert a json array to an array of Strings.
 	 */
@@ -32,13 +40,13 @@ public class JsonUtil {
 			JSONArray jsonArray = new JSONArray(json);
 			List<String> rtn = toArrayList(jsonArray);
 			return rtn;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			try {
 				JSONObject obj = new JSONObject(json);
 				ArrayList<String> rtn = new ArrayList<String>();
 				rtn.add(obj.toString());
 				return rtn;
-			} catch(Exception exp2) {
+			} catch (Exception exp2) {
 				return null;
 			}
 		}
@@ -48,42 +56,55 @@ public class JsonUtil {
 	 * Convert a json array to an array of Strings.
 	 */
 	public static List<String> toArrayList(JSONArray jsonArray) {
-		ArrayList<String> rtn = new ArrayList<String>();
-		for(int i=0;i<jsonArray.length();i++) {
-			Object obj = jsonArray.get(i);
-			if (obj instanceof JSONObject) {
-				JSONObject jsonObj = (JSONObject) obj;
+		try {
+			ArrayList<String> rtn = new ArrayList<String>();
+			for (int i = 0; i < jsonArray.length(); i++) {
+				Object obj = jsonArray.get(i);
+				if (obj instanceof JSONObject) {
+					JSONObject jsonObj = (JSONObject) obj;
+				}
+				if (obj == null) {
+					rtn.add(null);
+				} else {
+					rtn.add(obj.toString());
+				}
 			}
-			if (obj == null) {
-				rtn.add(null);
-			} else {
-				rtn.add(obj.toString());
-			}
+			return rtn;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
 		}
-		return rtn;
 	}
 
 	/**
 	 * Convert a json array to an array of JSONObjects.
 	 */
 	public static ArrayList<JSONObject> toJsonObjectArrayList(JSONArray jsonArray) {
-		ArrayList<JSONObject> rtn = new ArrayList<JSONObject>();
-		for (Object obj : jsonArray) {
-			if (obj != null && obj instanceof JSONObject) {
-				JSONObject jsonObj = (JSONObject) obj;
-				rtn.add(jsonObj);
+		try {
+			ArrayList<JSONObject> rtn = new ArrayList<JSONObject>();
+			for (int i = 0; i < jsonArray.length(); i++) {
+				Object obj = jsonArray.get(i);
+				if (obj != null && obj instanceof JSONObject) {
+					JSONObject jsonObj = (JSONObject) obj;
+					rtn.add(jsonObj);
+				}
 			}
+			return rtn;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
 		}
-		return rtn;
 	}
 
 	/**
 	 * Convert a JSONObject to an array of JSONObjects.
 	 */
 	public List<JSONObject> getList(JSONObject jsonObj, String name) {
-		JSONArray jsonArray = jsonObj.getJSONArray(name);
-		ArrayList<JSONObject> rtn = toJsonObjectArrayList(jsonArray);
-		return rtn;
+		try {
+			JSONArray jsonArray = jsonObj.getJSONArray(name);
+			ArrayList<JSONObject> rtn = toJsonObjectArrayList(jsonArray);
+			return rtn;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
 
 	//
@@ -144,8 +165,12 @@ public class JsonUtil {
 			JSONObject obj = new JSONObject(json);
 			return obj.toString();
 		} catch (Exception exp) {
-			JSONArray array = new JSONArray(json);
-			return array.toString();
+			try {
+				JSONArray array = new JSONArray(json);
+				return array.toString();
+			} catch(Exception exp2) {
+				throw new RuntimeException(exp2);
+			}
 		}
 	}
 

@@ -22,7 +22,7 @@ import com.nach.core.util.file.ZipUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class ExcelUtilLargeFileIntegrationTest {
+public class ExcelUtilLargeFileIntegrationTestWeekly {
 
 	private static final String DIR = "/com/nach/core/testfiles/excel";
 

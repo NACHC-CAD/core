@@ -11,9 +11,13 @@ public class OAuthTokenResponseParser {
 	}
 	
 	public String getToken(String response) {
-		JSONObject responseObj = new JSONObject(response);
-		String rtn = responseObj.getString("access_token");
-		return rtn;
+		try {
+			JSONObject responseObj = new JSONObject(response);
+			String rtn = responseObj.getString("access_token");
+			return rtn;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
 
 }
