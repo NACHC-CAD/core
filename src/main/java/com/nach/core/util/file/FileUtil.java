@@ -128,23 +128,28 @@ public class FileUtil {
 		return rtn;
 	}
 
-	public static List<File> list(File dir) {
+	public static List<File> sortByName(List<File> files) {
 		Comparator<File> comp = new Comparator<File>() {
 			@Override
 			public int compare(File file1, File file2) {
 				return file1.getName().compareTo(file2.getName());
 			}
 		};
+		Collections.sort(files, comp);
+		return files;
+	}
+	
+	public static List<File> list(File dir) {
 		File[] fileArray = dir.listFiles();
 		List<File> files = Arrays.asList(fileArray);
 		ArrayList<File> rtn = new ArrayList<File>();
 		rtn.addAll(files);
-		Collections.sort(files, comp);
+		files = sortByName(files);
 		return rtn;
 	}
 
 	public static List<File> listFiles(File file, String pattern) {
-		ArrayList<File> rtn = new ArrayList<File>();
+		List<File> rtn = new ArrayList<File>();
 		DirectoryScanner scanner = new DirectoryScanner();
 		scanner.setIncludes(new String[] { pattern });
 		scanner.setBasedir(file);
@@ -154,11 +159,12 @@ public class FileUtil {
 		for(String str : files) {
 			rtn.add(new File(file, str));
 		}
+		rtn = sortByName(rtn);
 		return rtn;
 	}
 
 	public static List<File> listFiles(File file, String[] includes) {
-		ArrayList<File> rtn = new ArrayList<File>();
+		List<File> rtn = new ArrayList<File>();
 		DirectoryScanner scanner = new DirectoryScanner();
 		scanner.setIncludes(includes);
 		scanner.setBasedir(file);
@@ -168,6 +174,7 @@ public class FileUtil {
 		for(String str : files) {
 			rtn.add(new File(file, str));
 		}
+		rtn = sortByName(rtn);
 		return rtn;
 	}
 	

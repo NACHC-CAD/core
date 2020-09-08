@@ -16,6 +16,19 @@ public class DatabricksDbUtil {
 	// connection
 	//
 
+	public static Connection getConnection(String url, String token) {
+		try {
+			if(url.endsWith("PWD=") == false) {
+				url = url + "PWD=";
+			}
+			url = url + token;
+			Connection conn = DriverManager.getConnection(url);
+			return conn;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
 	public static Connection getConnection(String url) {
 		try {
 			Connection conn = DriverManager.getConnection(url);
