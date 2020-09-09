@@ -92,13 +92,13 @@ public class DatabricksFileUtil {
 	 * file name. The file will be placed at filePath/fileName location.
 	 * 
 	 */
-	public DatabricksFileUtilResponse put(String dirPath, File file) {
+	public DatabricksFileUtilResponse put(String databricksDirPath, File file) {
 		Timer timer = new Timer();
 		timer.start();
 		url = url + "/dbfs/put";
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
-		String filePath = dirPath + "/" + file.getName();
+		String filePath = databricksDirPath + "/" + file.getName();
 		client.addFormData("path", filePath);
 		client.postFile(file, filePath);
 		// create rtn object
@@ -107,7 +107,7 @@ public class DatabricksFileUtil {
 		rtn.init(client, file, timer, filePath);
 		if (rtn.isSuccess() == false) {
 			log.info(rtn.isSuccess() + ": (" + rtn.getStatusCode() + ") " + rtn.getDatabricksFilePath() + "\t" + rtn.getResponse());
-			throw new RuntimeException("Put failed for " + dirPath, new DatabricksFileException(rtn));
+			throw new RuntimeException("Put failed for " + databricksDirPath, new DatabricksFileException(rtn));
 		}
 		return rtn;
 	}

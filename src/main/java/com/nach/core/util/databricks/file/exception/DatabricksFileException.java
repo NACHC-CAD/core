@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DatabricksFileException extends Exception {
+public class DatabricksFileException extends RuntimeException {
 
 	private DatabricksFileUtilResponse resp;
 

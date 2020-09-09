@@ -182,6 +182,10 @@ public class FileUtil {
 		return file.length();
 	}
 
+	public static long getSize(File file) {
+		return size(file);
+	}
+
 	public static void rmdir(File dir) {
 		try {
 			FileUtils.forceDelete(dir);
