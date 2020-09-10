@@ -216,6 +216,10 @@ public class HttpRequestClient {
 	// TODO: postFile methods need to be parameterized.  
 
 	public void postFile(File file, String path) {
+		postFile(file, path, false);
+	}
+
+	public void postFile(File file, String path, boolean replace) {
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(this.url);
@@ -224,6 +228,9 @@ public class HttpRequestClient {
 			FileBody uploadFilePart = new FileBody(file);
 			MultipartEntity reqEntity = new MultipartEntity();
 			reqEntity.addPart("path", new StringBody(path));
+			if(replace == true) {
+				reqEntity.addPart("overwrite", new StringBody("true"));
+			}
 			this.addHeaders(httpPost);
 			reqEntity.addPart("upload-file", uploadFilePart);
 			httpPost.setEntity(reqEntity);

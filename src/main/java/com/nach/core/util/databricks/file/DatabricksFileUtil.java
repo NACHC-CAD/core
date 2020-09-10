@@ -77,29 +77,29 @@ public class DatabricksFileUtil {
 
 	/**
 	 * 
-	 * Put all the files in a dir that match the pattern on the Databricks server.  
-	 * 
-	 */	
-	public List<DatabricksFileUtilResponse> put(String dirPath, File dir, String pattern) {
-		ArrayList<DatabricksFileUtilResponse> rtn = new ArrayList<DatabricksFileUtilResponse>();
-		List<File> files = FileUtil.listFiles(dir, pattern);
-		int cnt = 0;
-		for (File file : files) {
-			cnt++;
-			log.info("File " + cnt + " of " + files.size());
-			DatabricksFileUtilResponse resp = put(dirPath, file);
-			rtn.add(resp);
-		}
-		return rtn;
-	}
-
-	/**
-	 * 
 	 * Method to put a file on the server. The filePath is the path with out the
 	 * file name. The file will be placed at filePath/fileName location.
 	 * 
 	 */
 	public DatabricksFileUtilResponse put(String databricksDirPath, File file) {
+		return put(databricksDirPath, file, false);
+	}
+
+	/**
+	 * 
+	 * Put a file on the server. Replace existing file if replace if file exists on the server.
+	 * 
+	 */
+	public DatabricksFileUtilResponse replace(String databricksDirPath, File file) {
+		return put(databricksDirPath, file, true);
+	}
+
+	/**
+	 * 
+	 * Put a file on the server. Replace existing file if replace is set to true.
+	 * 
+	 */
+	public DatabricksFileUtilResponse put(String databricksDirPath, File file, boolean replace) {
 		Timer timer = new Timer();
 		timer.start();
 		String url = baseUrl + "/dbfs/put";
@@ -107,7 +107,10 @@ public class DatabricksFileUtil {
 		client.setOauthToken(token);
 		String filePath = databricksDirPath + "/" + file.getName();
 		client.addFormData("path", filePath);
-		client.postFile(file, filePath);
+		if(replace == true) {
+			client.addFormData("overwrite", "true");
+		}
+		client.postFile(file, filePath, replace);
 		// create rtn object
 		timer.stop();
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
@@ -141,6 +144,24 @@ public class DatabricksFileUtil {
 		if (rtn.isSuccess() == false) {
 			log.info(rtn.isSuccess() + ": (" + rtn.getStatusCode() + ") " + rtn.getDatabricksFilePath() + "\t" + rtn.getResponse());
 			throw new RuntimeException("Put failed for " + databricksDirPath, new DatabricksFileException(rtn));
+		}
+		return rtn;
+	}
+
+	/**
+	 * 
+	 * Put all the files in a dir that match the pattern on the Databricks server.  
+	 * 
+	 */	
+	public List<DatabricksFileUtilResponse> put(String dirPath, File dir, String pattern) {
+		ArrayList<DatabricksFileUtilResponse> rtn = new ArrayList<DatabricksFileUtilResponse>();
+		List<File> files = FileUtil.listFiles(dir, pattern);
+		int cnt = 0;
+		for (File file : files) {
+			cnt++;
+			log.info("File " + cnt + " of " + files.size());
+			DatabricksFileUtilResponse resp = put(dirPath, file);
+			rtn.add(resp);
 		}
 		return rtn;
 	}
