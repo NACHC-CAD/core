@@ -232,6 +232,16 @@ public class FileUtil {
 			throw new RuntimeException(exp);
 		}
 	}
+	
+	public static InputStream getInputStream(File file) {
+		try {
+			InputStream rtn = new FileInputStream(file);
+			return rtn;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 }
 
 

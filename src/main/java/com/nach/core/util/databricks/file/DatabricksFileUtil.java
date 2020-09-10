@@ -1,6 +1,7 @@
 package com.nach.core.util.databricks.file;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -105,6 +106,26 @@ public class DatabricksFileUtil {
 		timer.stop();
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
 		rtn.init(client, file, timer, filePath);
+		if (rtn.isSuccess() == false) {
+			log.info(rtn.isSuccess() + ": (" + rtn.getStatusCode() + ") " + rtn.getDatabricksFilePath() + "\t" + rtn.getResponse());
+			throw new RuntimeException("Put failed for " + databricksDirPath, new DatabricksFileException(rtn));
+		}
+		return rtn;
+	}
+
+	public DatabricksFileUtilResponse put(String databricksDirPath, InputStream in, String fileName) {
+		Timer timer = new Timer();
+		timer.start();
+		url = url + "/dbfs/put";
+		HttpRequestClient client = new HttpRequestClient(url);
+		client.setOauthToken(token);
+		String filePath = databricksDirPath + "/" + fileName;
+		client.addFormData("path", filePath);
+		client.postFile(fileName, in, filePath);
+		// create rtn object
+		timer.stop();
+		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
+		rtn.init(client, null, timer, filePath);
 		if (rtn.isSuccess() == false) {
 			log.info(rtn.isSuccess() + ": (" + rtn.getStatusCode() + ") " + rtn.getDatabricksFilePath() + "\t" + rtn.getResponse());
 			throw new RuntimeException("Put failed for " + databricksDirPath, new DatabricksFileException(rtn));

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -27,8 +28,10 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.AuthPolicy;
 import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -209,6 +212,8 @@ public class HttpRequestClient {
 	//
 	// post file
 	//
+	
+	// TODO: postFile methods need to be parameterized.  
 
 	public void postFile(File file, String path) {
 		try {
@@ -225,6 +230,37 @@ public class HttpRequestClient {
 			HttpResponse response = httpClient.execute(httpPost);
 			this.responseInputStream = response.getEntity().getContent();
 			this.setStatusCode(response.getStatusLine().getStatusCode());
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	public void postFile(String fileName, InputStream in, String path) {
+		try {
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpPost httpPost = new HttpPost(this.url);
+			httpPost.getParams().setParameter("path", path);
+			this.addFormParams(httpPost);
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+			byte[] bytes = IOUtils.toByteArray(in);
+			builder.addBinaryBody("upload-file", bytes, ContentType.APPLICATION_OCTET_STREAM, fileName);
+			builder.addPart("path", new StringBody(path));
+
+			HttpEntity reqEntity = builder.build();
+			
+			/*
+			MultipartEntity reqEntity = new MultipartEntity();
+			FileBody uploadFilePart = new FileBody(file);
+			reqEntity.addPart("upload-file", uploadFilePart);
+			FileBody uploadFilePart = new File
+			reqEntity.addPart("path", new StringBody(path));
+			*/
+			this.addHeaders(httpPost);
+			httpPost.setEntity(reqEntity);
+			HttpResponse response = httpClient.execute(httpPost);
+			this.responseInputStream = response.getEntity().getContent();
+			this.setStatusCode(response.getStatusLine().getStatusCode());
+
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
