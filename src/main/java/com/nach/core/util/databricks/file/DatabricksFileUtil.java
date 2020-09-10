@@ -11,18 +11,19 @@ import com.nach.core.util.databricks.file.exception.DatabricksFileException;
 import com.nach.core.util.databricks.file.response.DatabricksFileUtilResponse;
 import com.nach.core.util.file.FileUtil;
 import com.nach.core.util.http.HttpRequestClient;
+import com.nach.core.util.json.JsonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class DatabricksFileUtil {
 
-	private String url;
+	private String baseUrl;
 
 	private String token;
 
 	public DatabricksFileUtil(String url, String token) {
-		this.url = url;
+		this.baseUrl = url;
 		this.token = token;
 	}
 	
@@ -36,7 +37,7 @@ public class DatabricksFileUtil {
 		Timer timer = new Timer();
 		timer.start();
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
-		url = url + "/dbfs/get-status?path=" + path;
+		String url = baseUrl + "/dbfs/get-status?path=" + path;
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
 		client.doGet();
@@ -66,7 +67,7 @@ public class DatabricksFileUtil {
 	 * 
 	 */
 	public String list(String dirPath) {
-		url = url + "/dbfs/list?path=" + dirPath;
+		String url = baseUrl + "/dbfs/list?path=" + dirPath;
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
 		client.doGet();
@@ -74,6 +75,11 @@ public class DatabricksFileUtil {
 		return response;
 	}
 
+	/**
+	 * 
+	 * Put all the files in a dir that match the pattern on the Databricks server.  
+	 * 
+	 */	
 	public List<DatabricksFileUtilResponse> put(String dirPath, File dir, String pattern) {
 		ArrayList<DatabricksFileUtilResponse> rtn = new ArrayList<DatabricksFileUtilResponse>();
 		List<File> files = FileUtil.listFiles(dir, pattern);
@@ -96,7 +102,7 @@ public class DatabricksFileUtil {
 	public DatabricksFileUtilResponse put(String databricksDirPath, File file) {
 		Timer timer = new Timer();
 		timer.start();
-		url = url + "/dbfs/put";
+		String url = baseUrl + "/dbfs/put";
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
 		String filePath = databricksDirPath + "/" + file.getName();
@@ -113,10 +119,16 @@ public class DatabricksFileUtil {
 		return rtn;
 	}
 
+	/**
+	 * 
+	 * Method to put a file on the server from an input stream. The filePath is the path with out the
+	 * file name. The file will be placed at filePath/fileName location.
+	 * 
+	 */
 	public DatabricksFileUtilResponse put(String databricksDirPath, InputStream in, String fileName) {
 		Timer timer = new Timer();
 		timer.start();
-		url = url + "/dbfs/put";
+		String url = baseUrl + "/dbfs/put";
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
 		String filePath = databricksDirPath + "/" + fileName;
@@ -139,7 +151,7 @@ public class DatabricksFileUtil {
 	 * 
 	 */
 	public DatabricksFileUtilResponse delete(String filePath) {
-		url = url + "/dbfs/delete";
+		String url = baseUrl + "/dbfs/delete";
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
 		String json = "{\"path\":\"" + filePath + "\"}";
@@ -157,7 +169,7 @@ public class DatabricksFileUtil {
 	public DatabricksFileUtilResponse rmdir(String dirPath) {
 		Timer timer = new Timer();
 		timer.start();
-		url = url + "/dbfs/delete";
+		String url = baseUrl + "/dbfs/delete";
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
 		String json = "{\"path\":\"" + dirPath + "\", \"recursive\":\"true\"}";
@@ -168,4 +180,28 @@ public class DatabricksFileUtil {
 		return rtn;
 	}
 
+	/**
+	 * 
+	 * Download a file from the Databricks server.  
+	 * 
+	 */
+	public DatabricksFileUtilResponse get(String filePath) {
+		Timer timer = new Timer();
+		timer.start();
+		String url = baseUrl + "/dbfs/read";
+		url += "?path=" + filePath;
+		HttpRequestClient client = new HttpRequestClient(url);
+		client.setOauthToken(token);
+		String json = "{\"path\":\"" + filePath + "\"}";
+		client.doGet();
+		timer.stop();
+		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
+		rtn.init(client, null, timer, filePath);
+		if(rtn.isSuccess()) {
+			String data = JsonUtil.getString(rtn.getResponse(), "data");
+			rtn.initInputStreamFromBase64String(data);
+		}
+		return rtn;
+	}
+	
 }

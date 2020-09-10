@@ -1,7 +1,10 @@
 package com.nach.core.util.databricks.file.response;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 
+import org.apache.commons.codec.binary.Base64;
 import org.yaorma.util.time.TimeUtil;
 import org.yaorma.util.time.Timer;
 
@@ -37,6 +40,8 @@ public class DatabricksFileUtilResponse {
 	private double fileSize;
 	
 	private String response;
+	
+	private InputStream inputStream;
 	
 	private int statusCode;
 	
@@ -83,4 +88,8 @@ public class DatabricksFileUtilResponse {
 		this.databricksFilePath = databricksFilePath;
 	}
 	
+	public void initInputStreamFromBase64String(String data) {
+		byte[] bytes = Base64.decodeBase64(data);
+		this.inputStream = new ByteArrayInputStream(bytes);
+	}
 }
