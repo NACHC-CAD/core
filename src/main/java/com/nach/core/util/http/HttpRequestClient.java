@@ -242,7 +242,7 @@ public class HttpRequestClient {
 		}
 	}
 
-	public void postFile(String fileName, InputStream in, String path) {
+	public void postFile(String fileName, InputStream in, String path, boolean replace) {
 		try {
 			HttpClient httpClient = new DefaultHttpClient();
 			HttpPost httpPost = new HttpPost(this.url);
@@ -253,15 +253,12 @@ public class HttpRequestClient {
 			builder.addBinaryBody("upload-file", bytes, ContentType.APPLICATION_OCTET_STREAM, fileName);
 			builder.addPart("path", new StringBody(path));
 
+			if(replace == true) {
+				builder.addPart("overwrite", new StringBody("true"));
+			}
+
 			HttpEntity reqEntity = builder.build();
 			
-			/*
-			MultipartEntity reqEntity = new MultipartEntity();
-			FileBody uploadFilePart = new FileBody(file);
-			reqEntity.addPart("upload-file", uploadFilePart);
-			FileBody uploadFilePart = new File
-			reqEntity.addPart("path", new StringBody(path));
-			*/
 			this.addHeaders(httpPost);
 			httpPost.setEntity(reqEntity);
 			HttpResponse response = httpClient.execute(httpPost);

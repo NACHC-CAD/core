@@ -1,5 +1,6 @@
 package com.nach.core.util.databricks.file;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class DatabricksFileUtil {
 		this.baseUrl = url;
 		this.token = token;
 	}
-	
+
 	/**
 	 * 
 	 * Query if a file exists at the given location on the server. Path can be a
@@ -87,7 +88,8 @@ public class DatabricksFileUtil {
 
 	/**
 	 * 
-	 * Put a file on the server. Replace existing file if replace if file exists on the server.
+	 * Put a file on the server. Replace existing file if replace if file exists on
+	 * the server.
 	 * 
 	 */
 	public DatabricksFileUtilResponse replace(String databricksDirPath, File file) {
@@ -107,7 +109,7 @@ public class DatabricksFileUtil {
 		client.setOauthToken(token);
 		String filePath = databricksDirPath + "/" + file.getName();
 		client.addFormData("path", filePath);
-		if(replace == true) {
+		if (replace == true) {
 			client.addFormData("overwrite", "true");
 		}
 		client.postFile(file, filePath, replace);
@@ -124,11 +126,12 @@ public class DatabricksFileUtil {
 
 	/**
 	 * 
-	 * Method to put a file on the server from an input stream. The filePath is the path with out the
-	 * file name. The file will be placed at filePath/fileName location.
+	 * Method to put a file on the server from an input stream. The filePath is the
+	 * path with out the file name. The file will be placed at filePath/fileName
+	 * location.
 	 * 
 	 */
-	public DatabricksFileUtilResponse put(String databricksDirPath, InputStream in, String fileName) {
+	public DatabricksFileUtilResponse put(String databricksDirPath, InputStream in, String fileName, boolean overwrite) {
 		Timer timer = new Timer();
 		timer.start();
 		String url = baseUrl + "/dbfs/put";
@@ -136,7 +139,7 @@ public class DatabricksFileUtil {
 		client.setOauthToken(token);
 		String filePath = databricksDirPath + "/" + fileName;
 		client.addFormData("path", filePath);
-		client.postFile(fileName, in, filePath);
+		client.postFile(fileName, in, filePath, overwrite);
 		// create rtn object
 		timer.stop();
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
@@ -148,11 +151,16 @@ public class DatabricksFileUtil {
 		return rtn;
 	}
 
+	public DatabricksFileUtilResponse put(String databricksDirPath, String fileAsString, String fileName, boolean overwrite) {
+		InputStream in = new ByteArrayInputStream(fileAsString.getBytes());
+		return put(databricksDirPath, in, fileName, overwrite);
+	}
+
 	/**
 	 * 
-	 * Put all the files in a dir that match the pattern on the Databricks server.  
+	 * Put all the files in a dir that match the pattern on the Databricks server.
 	 * 
-	 */	
+	 */
 	public List<DatabricksFileUtilResponse> put(String dirPath, File dir, String pattern) {
 		ArrayList<DatabricksFileUtilResponse> rtn = new ArrayList<DatabricksFileUtilResponse>();
 		List<File> files = FileUtil.listFiles(dir, pattern);
@@ -203,7 +211,7 @@ public class DatabricksFileUtil {
 
 	/**
 	 * 
-	 * Download a file from the Databricks server.  
+	 * Download a file from the Databricks server.
 	 * 
 	 */
 	public DatabricksFileUtilResponse get(String filePath) {
@@ -218,11 +226,11 @@ public class DatabricksFileUtil {
 		timer.stop();
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
 		rtn.init(client, null, timer, filePath);
-		if(rtn.isSuccess()) {
+		if (rtn.isSuccess()) {
 			String data = JsonUtil.getString(rtn.getResponse(), "data");
 			rtn.initInputStreamFromBase64String(data);
 		}
 		return rtn;
 	}
-	
+
 }

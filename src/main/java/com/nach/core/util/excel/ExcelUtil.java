@@ -323,6 +323,36 @@ public class ExcelUtil {
 		}
 	}
 
+	public static void writeCsv(Writer writer, Sheet sheet) {
+		CSVPrinter csvPrinter = null;
+		try {
+			csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
+			// iterate over each row
+			Iterator<Row> rowIterator = sheet.rowIterator();
+			while (rowIterator.hasNext()) {
+				Row row = rowIterator.next();
+				// iterate over each cell
+				Iterator<Cell> cellIterator = row.cellIterator();
+				while (cellIterator.hasNext()) {
+					Cell cell = cellIterator.next();
+					csvPrinter.print(cell.getStringCellValue());
+				}
+				csvPrinter.println();
+			}
+			csvPrinter.flush();
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		} finally {
+			if (csvPrinter != null) {
+				try {
+					csvPrinter.close();
+				} catch (Exception exp) {
+					throw new RuntimeException(exp);
+				}
+			}
+		}
+	}
+	
 	public static void save(Workbook book, File file) {
 		OutputStream out = null;
 		try {

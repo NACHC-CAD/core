@@ -28,7 +28,7 @@ public class JsonUtil {
 			List<String> rtn = toArrayList(array);
 			return rtn;
 		} catch(Exception exp) {
-			throw new RuntimeException(exp);
+			return new ArrayList<String>();
 		}
 	}
 
