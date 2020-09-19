@@ -16,9 +16,45 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.DirectoryScanner;
 
+import lombok.extern.slf4j.Slf4j;
 
+
+@Slf4j
 public class FileUtil {
 
+	//
+	// get a file based on class path (e.g. /com/myorg/myproj/myfile.txt)
+	//
+	
+	public static File getFile(String name) {
+		String filePath = "/";
+		String rootDirName = FileUtil.class.getResource(filePath).getPath();
+		File rtn = new File(rootDirName, name);
+		return rtn;
+	}
+
+	//
+	// get file from project root (based on mvn project)
+	//
+	
+	public static File getProjectRoot() {
+		String filePath = "/";
+		String rootDirName = FileUtil.class.getResource(filePath).getPath();
+		File rtn = new File(rootDirName, "../../");
+		return rtn;
+	}
+
+	public static File getFromProjectRoot(String fileName) {
+		File root = getProjectRoot();
+		File file = new File(root, fileName);
+		return file;
+	}
+
+	//
+	// get file contents as a string
+	//
+	
+	
 	/**
 	 * Returns contents of a file as a string for a given filePath.
 	 * 
@@ -83,6 +119,10 @@ public class FileUtil {
 		}
 	}
 
+	//
+	// get file as input stream
+	//
+	
 	/**
 	 * Returns an input stream for the file.
 	 * 
@@ -99,19 +139,15 @@ public class FileUtil {
 		}
 	}
 
-	public static File getProjectRoot() {
-		String filePath = "/";
-		String rootDirName = FileUtil.class.getResource(filePath).getPath();
-		File rtn = new File(rootDirName, "../../");
-		return rtn;
+	public static InputStream getInputStream(File file) {
+		try {
+			InputStream rtn = new FileInputStream(file);
+			return rtn;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
-
-	public static File getFromProjectRoot(String fileName) {
-		File root = getProjectRoot();
-		File file = new File(root, fileName);
-		return file;
-	}
-
+	
 	public static InputStream getInputStreamFromProjectRoot(String fileName) {
 		try {
 			InputStream in = new FileInputStream(FileUtil.getFromProjectRoot(fileName));
@@ -121,23 +157,9 @@ public class FileUtil {
 		}
 	}
 
-	public static File getFile(String name) {
-		String filePath = "/";
-		String rootDirName = FileUtil.class.getResource(filePath).getPath();
-		File rtn = new File(rootDirName, name);
-		return rtn;
-	}
-
-	public static List<File> sortByName(List<File> files) {
-		Comparator<File> comp = new Comparator<File>() {
-			@Override
-			public int compare(File file1, File file2) {
-				return file1.getName().compareTo(file2.getName());
-			}
-		};
-		Collections.sort(files, comp);
-		return files;
-	}
+	//
+	// list files
+	//
 	
 	public static List<File> list(File dir) {
 		File[] fileArray = dir.listFiles();
@@ -177,6 +199,55 @@ public class FileUtil {
 		rtn = sortByName(rtn);
 		return rtn;
 	}
+
+	//
+	// sort a list of files by name
+	//
+	
+	public static List<File> sortByName(List<File> files) {
+		Comparator<File> comp = new Comparator<File>() {
+			@Override
+			public int compare(File file1, File file2) {
+				return file1.getName().compareTo(file2.getName());
+			}
+		};
+		Collections.sort(files, comp);
+		return files;
+	}
+
+	//
+	// delete dirs
+	//
+	
+	public static void rmdir(File dir) {
+		try {
+			if(dir.exists()) {
+				log.info("Deleting dir: " + getCanonicalPath(dir));
+				FileUtils.forceDelete(dir);
+			}
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
+	public static void clearContents(File dir) {
+		log.info("Clearing contents");
+		if(dir.exists()) {
+			rmdir(dir);
+		}
+		if(dir.exists() == true) {
+			throw new RuntimeException("Dir not deleted: " + dir);
+		}
+		log.info("Creating dir: " + getCanonicalPath(dir));
+		dir.mkdir();
+		if(dir.exists() == false) {
+			throw new RuntimeException("Could not create directory: " + dir);
+		}
+	}
+	
+	//
+	// get the size of a file
+	//
 	
 	public static long size(File file) {
 		return file.length();
@@ -186,27 +257,9 @@ public class FileUtil {
 		return size(file);
 	}
 
-	public static void rmdir(File dir) {
-		try {
-			FileUtils.forceDelete(dir);
-		} catch(Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-	
-	public static void clearContents(File dir) {
-		if(dir.exists()) {
-			return;
-		}
-		rmdir(dir);
-		if(dir.exists() == true) {
-			throw new RuntimeException("Dir not deleted: " + dir);
-		}
-		dir.mkdir();
-		if(dir.exists() == false) {
-			throw new RuntimeException("Could not create directory: " + dir);
-		}
-	}
+	//
+	// get the path of a file (wrap checked exception)
+	//
 	
 	public static String getCanonicalPath(File file) {
 		try {
@@ -217,6 +270,10 @@ public class FileUtil {
 		
 	}
 	
+	//
+	// create a file (wrap checked exception)
+	//
+	
 	public static void createNewFile(File file) {
 		try {
 			file.createNewFile();
@@ -225,18 +282,13 @@ public class FileUtil {
 		}
 	}
 
+	//
+	// close (wrap checked exception)
+	//
+	
 	public static void close(OutputStream out) {
 		try {
 			out.close();
-		} catch(Exception exp) {
-			throw new RuntimeException(exp);
-		}
-	}
-	
-	public static InputStream getInputStream(File file) {
-		try {
-			InputStream rtn = new FileInputStream(file);
-			return rtn;
 		} catch(Exception exp) {
 			throw new RuntimeException(exp);
 		}
