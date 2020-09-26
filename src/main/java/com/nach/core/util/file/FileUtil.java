@@ -18,14 +18,19 @@ import org.apache.tools.ant.DirectoryScanner;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
 public class FileUtil {
+
+	// * * *
+	//
+	// FILE METHODS
+	//
+	// * * *
 
 	//
 	// get a file based on class path (e.g. /com/myorg/myproj/myfile.txt)
 	//
-	
+
 	public static File getFile(String name) {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
@@ -36,7 +41,7 @@ public class FileUtil {
 	//
 	// get file from project root (based on mvn project)
 	//
-	
+
 	public static File getProjectRoot() {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
@@ -53,8 +58,7 @@ public class FileUtil {
 	//
 	// get file contents as a string
 	//
-	
-	
+
 	/**
 	 * Returns contents of a file as a string for a given filePath.
 	 * 
@@ -73,29 +77,7 @@ public class FileUtil {
 	 * "/com/mypackage/my-info.props".
 	 */
 	public static String getAsString(InputStream is) {
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new InputStreamReader(is));
-			StringBuilder sb = new StringBuilder();
-			String line = br.readLine();
-			while (line != null) {
-				sb.append(line);
-				sb.append(System.lineSeparator());
-				line = br.readLine();
-			}
-			String rtn = sb.toString();
-			return rtn;
-		} catch (Exception exp) {
-			throw new RuntimeException(exp);
-		} finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (Exception exp) {
-					throw new RuntimeException(exp);
-				}
-			}
-		}
+		return head(is, null);
 	}
 
 	/**
@@ -122,7 +104,7 @@ public class FileUtil {
 	//
 	// get file as input stream
 	//
-	
+
 	/**
 	 * Returns an input stream for the file.
 	 * 
@@ -143,11 +125,11 @@ public class FileUtil {
 		try {
 			InputStream rtn = new FileInputStream(file);
 			return rtn;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	public static InputStream getInputStreamFromProjectRoot(String fileName) {
 		try {
 			InputStream in = new FileInputStream(FileUtil.getFromProjectRoot(fileName));
@@ -157,10 +139,61 @@ public class FileUtil {
 		}
 	}
 
+	/**
+	 * 
+	 * Method that returns the first n rows of a file as a string.
+	 * 
+	 */
+	public static String head(File file, Integer n) {
+		try {
+			InputStream is = new FileInputStream(file);
+			return head(is, n);
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	public static String head(InputStream is, Integer n) {
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(is));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+			int cnt = 0;
+			while (line != null) {
+				cnt++;
+				if (n != null && cnt > n) {
+					break;
+				}
+				sb.append(line);
+				sb.append(System.lineSeparator());
+				line = br.readLine();
+			}
+			String rtn = sb.toString();
+			return rtn;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+				} catch (Exception exp) {
+					throw new RuntimeException(exp);
+				}
+			}
+		}
+	}
+
+	// * * *
+	//
+	// DIRECTORY METHODS
+	//
+	// * * *
+
 	//
 	// list files
 	//
-	
+
 	public static List<File> list(File dir) {
 		File[] fileArray = dir.listFiles();
 		List<File> files = Arrays.asList(fileArray);
@@ -178,7 +211,7 @@ public class FileUtil {
 		scanner.setCaseSensitive(false);
 		scanner.scan();
 		String[] files = scanner.getIncludedFiles();
-		for(String str : files) {
+		for (String str : files) {
 			rtn.add(new File(file, str));
 		}
 		rtn = sortByName(rtn);
@@ -193,7 +226,7 @@ public class FileUtil {
 		scanner.setCaseSensitive(false);
 		scanner.scan();
 		String[] files = scanner.getIncludedFiles();
-		for(String str : files) {
+		for (String str : files) {
 			rtn.add(new File(file, str));
 		}
 		rtn = sortByName(rtn);
@@ -203,7 +236,7 @@ public class FileUtil {
 	//
 	// sort a list of files by name
 	//
-	
+
 	public static List<File> sortByName(List<File> files) {
 		Comparator<File> comp = new Comparator<File>() {
 			@Override
@@ -218,37 +251,37 @@ public class FileUtil {
 	//
 	// delete dirs
 	//
-	
+
 	public static void rmdir(File dir) {
 		try {
-			if(dir.exists()) {
+			if (dir.exists()) {
 				log.info("Deleting dir: " + getCanonicalPath(dir));
 				FileUtils.forceDelete(dir);
 			}
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	public static void clearContents(File dir) {
 		log.info("Clearing contents");
-		if(dir.exists()) {
+		if (dir.exists()) {
 			rmdir(dir);
 		}
-		if(dir.exists() == true) {
+		if (dir.exists() == true) {
 			throw new RuntimeException("Dir not deleted: " + dir);
 		}
 		log.info("Creating dir: " + getCanonicalPath(dir));
 		dir.mkdir();
-		if(dir.exists() == false) {
+		if (dir.exists() == false) {
 			throw new RuntimeException("Could not create directory: " + dir);
 		}
 	}
-	
+
 	//
 	// get the size of a file
 	//
-	
+
 	public static long size(File file) {
 		return file.length();
 	}
@@ -260,24 +293,24 @@ public class FileUtil {
 	//
 	// get the path of a file (wrap checked exception)
 	//
-	
+
 	public static String getCanonicalPath(File file) {
 		try {
 			return file.getCanonicalPath();
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
-		
+
 	}
-	
+
 	//
 	// create a file (wrap checked exception)
 	//
-	
+
 	public static void createNewFile(File file) {
 		try {
 			file.createNewFile();
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
@@ -285,15 +318,13 @@ public class FileUtil {
 	//
 	// close (wrap checked exception)
 	//
-	
+
 	public static void close(OutputStream out) {
 		try {
 			out.close();
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 }
-
-
