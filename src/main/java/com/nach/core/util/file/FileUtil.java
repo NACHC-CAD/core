@@ -233,6 +233,13 @@ public class FileUtil {
 		return rtn;
 	}
 
+	public static List<File> listFiles(File file) {
+		File[] files = file.listFiles();
+		List<File> rtn = Arrays.asList(files);
+		rtn = sortByName(rtn);
+		return rtn;
+	}
+
 	//
 	// sort a list of files by name
 	//
@@ -249,13 +256,23 @@ public class FileUtil {
 	}
 
 	//
+	// mkdirs
+	//
+	
+	public static File mkdirs(File dir, String name) {
+		File file = new File(dir, name);
+		file.mkdirs();
+		return file;
+	}
+	
+	//
 	// delete dirs
 	//
 
 	public static void rmdir(File dir) {
 		try {
 			if (dir.exists()) {
-				log.info("Deleting dir: " + getCanonicalPath(dir));
+				log.debug("Deleting dir: " + getCanonicalPath(dir));
 				FileUtils.forceDelete(dir);
 			}
 		} catch (Exception exp) {
@@ -263,15 +280,21 @@ public class FileUtil {
 		}
 	}
 
+	public static File clearContents(File dir, String name) {
+		File file = new File(dir, name);
+		clearContents(file);
+		return file;
+	}
+	
 	public static void clearContents(File dir) {
-		log.info("Clearing contents");
+		log.debug("Clearing contents");
 		if (dir.exists()) {
 			rmdir(dir);
 		}
 		if (dir.exists() == true) {
 			throw new RuntimeException("Dir not deleted: " + dir);
 		}
-		log.info("Creating dir: " + getCanonicalPath(dir));
+		log.debug("Creating dir: " + getCanonicalPath(dir));
 		dir.mkdir();
 		if (dir.exists() == false) {
 			throw new RuntimeException("Could not create directory: " + dir);
