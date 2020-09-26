@@ -21,4 +21,10 @@ public class StringUtil {
 		return temp.substring(temp.lastIndexOf(delim) + 1, temp.length());
 	}
 	
+	public static String removeSpecial(String str) {
+		//String  rtn = str.replaceAll("[^\\p{L}\\p{Z}]","");
+		String  rtn = str.replaceAll("[^A-Za-z0-9_\\-]","");
+		return rtn;
+	}
+	
 }

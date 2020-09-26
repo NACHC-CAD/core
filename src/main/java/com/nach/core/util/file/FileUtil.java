@@ -1,6 +1,7 @@
 package com.nach.core.util.file;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -148,7 +149,7 @@ public class FileUtil {
 		try {
 			InputStream is = new FileInputStream(file);
 			return head(is, n);
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
@@ -181,6 +182,38 @@ public class FileUtil {
 					throw new RuntimeException(exp);
 				}
 			}
+		}
+	}
+
+	// * * *
+	//
+	// WRITE METHODS
+	//
+	// * * *
+
+	public static void write(String string, File file) {
+		try {
+			InputStream initialStream = new ByteArrayInputStream(string.getBytes());
+			FileUtils.copyInputStreamToFile(initialStream, file);
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	// * * *
+	//
+	// FILE NAME METHODS
+	//
+	// * * *
+
+	public static String getPrefix(File file) {
+		String name = file.getName();
+		int end = name.lastIndexOf(".");
+		if (end < 0) {
+			return name;
+		} else {
+			String rtn = name.substring(0, end);
+			return rtn;
 		}
 	}
 
@@ -258,13 +291,13 @@ public class FileUtil {
 	//
 	// mkdirs
 	//
-	
+
 	public static File mkdirs(File dir, String name) {
 		File file = new File(dir, name);
 		file.mkdirs();
 		return file;
 	}
-	
+
 	//
 	// delete dirs
 	//
@@ -285,7 +318,7 @@ public class FileUtil {
 		clearContents(file);
 		return file;
 	}
-	
+
 	public static void clearContents(File dir) {
 		log.debug("Clearing contents");
 		if (dir.exists()) {
