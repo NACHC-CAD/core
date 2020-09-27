@@ -22,9 +22,15 @@ public class StringUtil {
 	}
 	
 	public static String removeSpecial(String str) {
-		//String  rtn = str.replaceAll("[^\\p{L}\\p{Z}]","");
-		String  rtn = str.replaceAll("[^A-Za-z0-9_\\-]","");
+		String  rtn = str.replaceAll("[^A-Za-z0-9_]","");
 		return rtn;
+	}
+	
+	public static String removeLeading(String str, String prefix) {
+		while(str.startsWith(prefix) && str.length() > 0) {
+			str = str.substring(1, str.length());
+		}
+		return str;
 	}
 	
 }

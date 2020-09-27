@@ -15,4 +15,9 @@ public class DatabricksFileException extends RuntimeException {
 		this.resp = resp;
 	}
 
+	public DatabricksFileException(DatabricksFileUtilResponse resp, String msg) {
+		super(msg);
+		this.resp = resp;
+	}
+	
 }
