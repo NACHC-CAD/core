@@ -1,5 +1,6 @@
 package com.nach.core.util.excel;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -102,6 +103,11 @@ public class ExcelUtil {
 		}
 	}
 
+	public static Workbook getWorkbook(String string) {
+		InputStream in = new ByteArrayInputStream(string.getBytes());
+		return getWorkbook(in);
+	}
+	
 	//
 	// spreadsheet methods
 	//

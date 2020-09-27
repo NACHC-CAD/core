@@ -92,32 +92,6 @@ public class ExcelUtilLargeFileIntegrationTestWeekly {
 		return targetFile;
 	}
 
-	private void readExcelFileXXX(File file) {
-		Workbook book = ExcelUtil.getWorkbook(file);
-		Sheet sheet = book.getSheetAt(0);
-		int cnt = 0;
-		for (int r = 0; r < sheet.getLastRowNum(); r++) {
-			Row row = sheet.getRow(r);
-			String rowAsString = "";
-			for (int c = 0; c < row.getLastCellNum(); c++) {
-				if (rowAsString != "") {
-					rowAsString += ",";
-				}
-				rowAsString += ExcelUtil.getStringValue(row, c);
-			}
-			if (cnt < 100) {
-				log.info(cnt + " \t" + rowAsString);
-			} else if (cnt <= 1000 && cnt % 100 == 0) {
-				log.info(cnt + " \t" + rowAsString);
-			} else if (cnt <= 10000 && cnt % 1000 == 0) {
-				log.info(cnt + " \t" + rowAsString);
-			} else if (cnt % 10000 == 0) {
-				log.info(cnt + " \t" + rowAsString);
-			}
-			cnt++;
-		}
-	}
-
 	private void readExcelFile(File file) {
 		log.info("Parsing excel");
 		log.info("Reading file: " + FileUtil.getCanonicalPath(file));

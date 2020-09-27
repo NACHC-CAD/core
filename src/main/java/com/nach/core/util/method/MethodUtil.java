@@ -8,14 +8,25 @@ public class MethodUtil {
 		try {
 			Method method = obj.getClass().getMethod(methodName);
 			Object rtn = method.invoke(obj);
-			if(rtn == null) {
+			if (rtn == null) {
 				return null;
 			} else {
 				return rtn.toString();
 			}
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
+	public static void set(Object obj, String methodName, Object val) {
+		try {
+			Class[] sig = new Class[] { val.getClass() };
+			Object[] args = new Object[] { val };
+			Method method = obj.getClass().getMethod(methodName, sig);
+			method.invoke(obj, args);
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
 }

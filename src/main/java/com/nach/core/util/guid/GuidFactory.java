@@ -10,9 +10,9 @@ public class GuidFactory {
 	private static Logger logger = LoggerFactory.getLogger(GuidFactory.class);
 	
 	static {
-		logger.info("init uuid...");
+		logger.debug("init uuid...");
 		UUID uuid = UUID.randomUUID();
-		logger.info("Done with uuid init.");
+		logger.debug("Done with uuid init.");
 	}
 	
 	public static String getGuid() {
