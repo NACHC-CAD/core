@@ -358,10 +358,17 @@ public class ExcelUtil {
 				Row row = rowIterator.next();
 				// iterate over each cell
 				Iterator<Cell> cellIterator = row.cellIterator();
+				int nextCell = 0;
 				while (cellIterator.hasNext()) {
 					Cell cell = cellIterator.next();
-//					csvPrinter.print(cell.getStringCellValue());
-					csvPrinter.print(ExcelUtil.getStringValue(cell));
+					int cellNum = cell.getColumnIndex();
+					while(cellNum > nextCell) {
+						csvPrinter.print("");
+						nextCell++;
+					}
+					nextCell = cellNum + 1;
+					String val = ExcelUtil.getStringValue(cell);
+					csvPrinter.print(val);
 				}
 				csvPrinter.println();
 			}
