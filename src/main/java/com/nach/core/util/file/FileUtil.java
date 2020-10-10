@@ -217,6 +217,12 @@ public class FileUtil {
 		}
 	}
 
+	public static String changeSuffix(File file, String suffix) {
+		String fileName = getPrefix(file);
+		String rtn = fileName + "." + suffix;
+		return rtn;
+	}
+	
 	// * * *
 	//
 	// DIRECTORY METHODS

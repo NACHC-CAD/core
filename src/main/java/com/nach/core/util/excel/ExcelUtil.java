@@ -4,12 +4,15 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -72,21 +75,20 @@ public class ExcelUtil {
 		return getReader(file, 0);
 	}
 
-	
 	public static StreamingReader getReader(File file, int sheetIndex) {
 		try {
 			InputStream in = new FileInputStream(file);
 			StreamingReader reader = StreamingReader.builder()
-			        .rowCacheSize(100)      // number of rows to keep in memory (defaults to 10)
-			        .bufferSize(4096)       // buffer size to use when reading InputStream to file (defaults to 1024)
-			        .sheetIndex(sheetIndex) // index of sheet to use
-			        .read(in);              // read the file
+					.rowCacheSize(100) // number of rows to keep in memory (defaults to 10)
+					.bufferSize(4096) // buffer size to use when reading InputStream to file (defaults to 1024)
+					.sheetIndex(sheetIndex) // index of sheet to use
+					.read(in); // read the file
 			return reader;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * Create a workbook object in memeory for the given input stream.
@@ -107,7 +109,7 @@ public class ExcelUtil {
 		InputStream in = new ByteArrayInputStream(string.getBytes());
 		return getWorkbook(in);
 	}
-	
+
 	//
 	// spreadsheet methods
 	//
@@ -128,6 +130,15 @@ public class ExcelUtil {
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
+	}
+
+	public static List<Sheet> getSheets(Workbook book) {
+		List<Sheet> rtn = new ArrayList<Sheet>();
+		for (int i = 0; i < book.getNumberOfSheets(); i++) {
+			Sheet sheet = book.getSheetAt(i);
+			rtn.add(sheet);
+		}
+		return rtn;
 	}
 
 	//
@@ -176,7 +187,6 @@ public class ExcelUtil {
 		return getStringValue(cell, null);
 	}
 
-
 	public static String getStringValue(Cell cell, Escape escape) {
 		if (cell == null) {
 			return null;
@@ -190,7 +200,7 @@ public class ExcelUtil {
 			return cell.getNumericCellValue() + "";
 		} else {
 			String rtn = cell.getStringCellValue();
-			if(escape != null) {
+			if (escape != null) {
 				rtn = escape.escape(rtn);
 			}
 			return rtn;
@@ -253,7 +263,7 @@ public class ExcelUtil {
 
 	public static void addCol(Row row, String val) {
 		int col = row.getLastCellNum();
-		if(col < 0) {
+		if (col < 0) {
 			col = 0;
 		}
 		Cell cell = row.createCell(col);
@@ -329,6 +339,15 @@ public class ExcelUtil {
 		}
 	}
 
+	public static void writeCsv(File file, Sheet sheet) {
+		try {
+			FileWriter writer = new FileWriter(file);
+			writeCsv(writer, sheet);
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 	public static void writeCsv(Writer writer, Sheet sheet) {
 		CSVPrinter csvPrinter = null;
 		try {
@@ -341,7 +360,8 @@ public class ExcelUtil {
 				Iterator<Cell> cellIterator = row.cellIterator();
 				while (cellIterator.hasNext()) {
 					Cell cell = cellIterator.next();
-					csvPrinter.print(cell.getStringCellValue());
+//					csvPrinter.print(cell.getStringCellValue());
+					csvPrinter.print(ExcelUtil.getStringValue(cell));
 				}
 				csvPrinter.println();
 			}
@@ -358,7 +378,7 @@ public class ExcelUtil {
 			}
 		}
 	}
-	
+
 	public static void save(Workbook book, File file) {
 		OutputStream out = null;
 		try {
@@ -385,7 +405,7 @@ public class ExcelUtil {
 			throw new RuntimeException(exp);
 		} finally {
 			close(book);
-			if(out != null) {
+			if (out != null) {
 				log.info("Closing");
 				FileUtil.close(out);
 				log.info("Done with close");
@@ -397,14 +417,14 @@ public class ExcelUtil {
 		try {
 			log.info("Closing workbook.");
 			book.close();
-			if(book instanceof SXSSFWorkbook) {
+			if (book instanceof SXSSFWorkbook) {
 				log.info("Doing dispose");
-				((SXSSFWorkbook)book).dispose();
+				((SXSSFWorkbook) book).dispose();
 			}
 			log.info("Done with close");
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 }
