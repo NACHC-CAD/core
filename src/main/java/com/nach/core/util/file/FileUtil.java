@@ -298,6 +298,11 @@ public class FileUtil {
 		return file;
 	}
 
+	public static File mkdirs(File dir) {
+		dir.mkdirs();
+		return dir;
+	}
+
 	//
 	// delete dirs
 	//
