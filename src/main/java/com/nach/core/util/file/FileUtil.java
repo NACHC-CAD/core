@@ -346,7 +346,7 @@ public class FileUtil {
 	}
 
 	//
-	// get the size of a file
+	// get the size of a file (in BYTES)
 	//
 
 	public static long size(File file) {
