@@ -33,8 +33,15 @@ public class FileUtil {
 	//
 
 	public static File getFile(String name) {
+		return getFile(name, false);
+	}
+
+	public static File getFile(String name, boolean swapOutMvnTestClasses) {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
+		if(swapOutMvnTestClasses == true) {
+			rootDirName = rootDirName.replace("test-classes", "classes");
+		}
 		File rtn = new File(rootDirName, name);
 		return rtn;
 	}

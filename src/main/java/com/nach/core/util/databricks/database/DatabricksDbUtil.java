@@ -2,11 +2,13 @@ package com.nach.core.util.databricks.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.yaorma.database.Data;
 import org.yaorma.database.Database;
+import org.yaorma.database.Row;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +21,7 @@ public class DatabricksDbUtil {
 
 	public static Connection getConnection(String url, String token) {
 		try {
-			if(url.endsWith("PWD=") == false) {
+			if (url.endsWith("PWD=") == false) {
 				url = url + "PWD=";
 			}
 			url = url + token;
@@ -156,6 +158,18 @@ public class DatabricksDbUtil {
 
 	public static void close(Connection conn) {
 		Database.close(conn);
+	}
+
+	public static List<String> listRawSchema(Connection conn) {
+		Data data = Database.query("show databases", conn);
+		ArrayList<String> rtn = new ArrayList<String>();
+		for (Row row : data) {
+			String str = row.get("namespace");
+			if (str != null && str.toLowerCase().equals("cosmos") == false && str.toLowerCase().equals("default") == false) {
+				rtn.add(str);
+			}
+		}
+		return rtn;
 	}
 
 }
