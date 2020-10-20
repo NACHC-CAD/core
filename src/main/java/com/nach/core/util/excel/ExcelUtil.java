@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -154,6 +155,9 @@ public class ExcelUtil {
 	}
 
 	public static Cell getCell(Sheet sheet, int row, int col) {
+		if(sheet.getRow(row) == null) {
+			return null;
+		}
 		return sheet.getRow(row).getCell(col);
 	}
 
@@ -181,19 +185,46 @@ public class ExcelUtil {
 	// methods to get the value of a cell
 	//
 
-	public static int getIntValue(Sheet sheet, int row, int col) {
+	public static Integer getIntValue(Sheet sheet, int row, int col) {
 		Cell cell = getCell(sheet, row, col);
+		if(cell == null) {
+			return null;
+		}
 		return getIntValue(cell);
 	}
 
-	public static int getIntValue(Cell cell) {
+	public static Double getDoubleValue(Sheet sheet, int row, int col) {
+		Cell cell = getCell(sheet, row, col);
+		if(cell == null) {
+			return null;
+		}
+		return getDoubleValue(cell);
+	}
+
+	public static Double getDoubleValue(Cell cell) {
 		try {
 			String val = getStringValue(cell);
+			if(StringUtils.isAllBlank(val)) {
+				return null;
+			}
+			double dub = Double.parseDouble(val);
+			return dub;
+		} catch (Exception exp) {
+			return null;
+		}
+	}
+
+	public static Integer getIntValue(Cell cell) {
+		try {
+			String val = getStringValue(cell);
+			if(StringUtils.isAllBlank(val)) {
+				return null;
+			}
 			double dub = Double.parseDouble(val);
 			int rtn = (int) dub;
 			return rtn;
 		} catch (Exception exp) {
-			throw new RuntimeException(exp);
+			return null;
 		}
 	}
 
@@ -215,12 +246,12 @@ public class ExcelUtil {
 		} else if (CellType.FORMULA == cellType) {
 			if (CellType.NUMERIC == cell.getCachedFormulaResultType()) {
 				return cell.getNumericCellValue() + "";
-			} else if(CellType.ERROR == cell.getCachedFormulaResultType()) {
+			} else if (CellType.ERROR == cell.getCachedFormulaResultType()) {
 				return null;
 			} else {
 				return cell.getStringCellValue();
 			}
-		} else if(CellType.ERROR == cellType) {
+		} else if (CellType.ERROR == cellType) {
 			return null;
 		} else {
 			String rtn = cell.getStringCellValue();
@@ -292,6 +323,32 @@ public class ExcelUtil {
 		}
 		Cell cell = row.createCell(col);
 		cell.setCellValue(val);
+	}
+
+	public static void addCol(Row row, Integer intVal) {
+		int col = row.getLastCellNum();
+		if (col < 0) {
+			col = 0;
+		}
+		Cell cell = row.createCell(col);
+		if(intVal == null) {
+			cell.setCellValue("");
+		} else {
+			cell.setCellValue(intVal);
+		}
+	}
+
+	public static void addCol(Row row, Double dubVal) {
+		int col = row.getLastCellNum();
+		if (col < 0) {
+			col = 0;
+		}
+		Cell cell = row.createCell(col);
+		if(dubVal == null) {
+			cell.setCellValue("");
+		} else {
+			cell.setCellValue(dubVal);
+		}
 	}
 
 	//
