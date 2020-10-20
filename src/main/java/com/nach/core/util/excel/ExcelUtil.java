@@ -153,6 +153,10 @@ public class ExcelUtil {
 		return row.cellIterator();
 	}
 
+	public static Cell getCell(Sheet sheet, int row, int col) {
+		return sheet.getRow(row).getCell(col);
+	}
+
 	//
 	// cell type method
 	//
@@ -177,11 +181,21 @@ public class ExcelUtil {
 	// methods to get the value of a cell
 	//
 
-	/**
-	 * 
-	 * Get the value of a cell for the given cell.
-	 * 
-	 */
+	public static int getIntValue(Sheet sheet, int row, int col) {
+		Cell cell = getCell(sheet, row, col);
+		return getIntValue(cell);
+	}
+
+	public static int getIntValue(Cell cell) {
+		try {
+			String val = getStringValue(cell);
+			double dub = Double.parseDouble(val);
+			int rtn = (int) dub;
+			return rtn;
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
 
 	public static String getStringValue(Cell cell) {
 		return getStringValue(cell, null);
@@ -198,6 +212,16 @@ public class ExcelUtil {
 			return rtn;
 		} else if (CellType.NUMERIC == cellType) {
 			return cell.getNumericCellValue() + "";
+		} else if (CellType.FORMULA == cellType) {
+			if (CellType.NUMERIC == cell.getCachedFormulaResultType()) {
+				return cell.getNumericCellValue() + "";
+			} else if(CellType.ERROR == cell.getCachedFormulaResultType()) {
+				return null;
+			} else {
+				return cell.getStringCellValue();
+			}
+		} else if(CellType.ERROR == cellType) {
+			return null;
 		} else {
 			String rtn = cell.getStringCellValue();
 			if (escape != null) {
@@ -343,11 +367,11 @@ public class ExcelUtil {
 		try {
 			FileWriter writer = new FileWriter(file);
 			writeCsv(writer, sheet);
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	public static void writeCsv(Writer writer, Sheet sheet) {
 		CSVPrinter csvPrinter = null;
 		try {
@@ -362,7 +386,7 @@ public class ExcelUtil {
 				while (cellIterator.hasNext()) {
 					Cell cell = cellIterator.next();
 					int cellNum = cell.getColumnIndex();
-					while(cellNum > nextCell) {
+					while (cellNum > nextCell) {
 						csvPrinter.print("");
 						nextCell++;
 					}
