@@ -17,6 +17,7 @@ import java.util.List;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -24,8 +25,14 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetView;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTSheetViews;
+import org.openxmlformats.schemas.spreadsheetml.x2006.main.CTWorksheet;
 import org.yaorma.util.time.TimeUtil;
 
 import com.monitorjbl.xlsx.StreamingReader;
@@ -155,7 +162,7 @@ public class ExcelUtil {
 	}
 
 	public static Cell getCell(Sheet sheet, int row, int col) {
-		if(sheet.getRow(row) == null) {
+		if (sheet.getRow(row) == null) {
 			return null;
 		}
 		return sheet.getRow(row).getCell(col);
@@ -187,7 +194,7 @@ public class ExcelUtil {
 
 	public static Integer getIntValue(Sheet sheet, int row, int col) {
 		Cell cell = getCell(sheet, row, col);
-		if(cell == null) {
+		if (cell == null) {
 			return null;
 		}
 		return getIntValue(cell);
@@ -195,7 +202,7 @@ public class ExcelUtil {
 
 	public static Double getDoubleValue(Sheet sheet, int row, int col) {
 		Cell cell = getCell(sheet, row, col);
-		if(cell == null) {
+		if (cell == null) {
 			return null;
 		}
 		return getDoubleValue(cell);
@@ -204,7 +211,7 @@ public class ExcelUtil {
 	public static Double getDoubleValue(Cell cell) {
 		try {
 			String val = getStringValue(cell);
-			if(StringUtils.isAllBlank(val)) {
+			if (StringUtils.isAllBlank(val)) {
 				return null;
 			}
 			double dub = Double.parseDouble(val);
@@ -217,7 +224,7 @@ public class ExcelUtil {
 	public static Integer getIntValue(Cell cell) {
 		try {
 			String val = getStringValue(cell);
-			if(StringUtils.isAllBlank(val)) {
+			if (StringUtils.isAllBlank(val)) {
 				return null;
 			}
 			double dub = Double.parseDouble(val);
@@ -316,6 +323,38 @@ public class ExcelUtil {
 		cell.setCellValue(val);
 	}
 
+	public static void setIntValue(Sheet sheet, Integer val, int r, int c) {
+		Row row = sheet.getRow(r);
+		if (row == null) {
+			row = sheet.createRow(r);
+		}
+		Cell cell = row.getCell(c);
+		if (cell == null) {
+			cell = row.createCell(c);
+		}
+		if (val != null) {
+			cell.setCellValue(val);
+		} else {
+			cell.setCellValue("");
+		}
+	}
+
+	public static void setIntValue(Sheet sheet, Double val, int r, int c) {
+		Row row = sheet.getRow(r);
+		if (row == null) {
+			row = sheet.createRow(r);
+		}
+		Cell cell = row.getCell(c);
+		if (cell == null) {
+			cell = row.createCell(c);
+		}
+		if (val != null) {
+			cell.setCellValue(val);
+		} else {
+			cell.setCellValue("");
+		}
+	}
+
 	public static void addCol(Row row, String val) {
 		int col = row.getLastCellNum();
 		if (col < 0) {
@@ -331,7 +370,7 @@ public class ExcelUtil {
 			col = 0;
 		}
 		Cell cell = row.createCell(col);
-		if(intVal == null) {
+		if (intVal == null) {
 			cell.setCellValue("");
 		} else {
 			cell.setCellValue(intVal);
@@ -344,7 +383,7 @@ public class ExcelUtil {
 			col = 0;
 		}
 		Cell cell = row.createCell(col);
-		if(dubVal == null) {
+		if (dubVal == null) {
 			cell.setCellValue("");
 		} else {
 			cell.setCellValue(dubVal);
@@ -366,6 +405,34 @@ public class ExcelUtil {
 
 	public static Row createNextRow(Sheet sheet) {
 		return sheet.createRow(sheet.getLastRowNum() + 1);
+	}
+
+	public static void recalculateAllFormulas(Workbook book) {
+		if (book instanceof XSSFWorkbook) {
+			HSSFFormulaEvaluator.evaluateAllFormulaCells(book);
+		} else {
+			XSSFFormulaEvaluator.evaluateAllFormulaCells(book);
+		}
+	}
+
+	public static void scrollToBegining(Sheet sheet) {
+		if (sheet instanceof XSSFSheet) {
+			CTWorksheet ctWorksheet = null;
+			CTSheetViews ctSheetViews = null;
+			CTSheetView ctSheetView = null;
+			XSSFSheet tempSheet = (XSSFSheet) sheet;
+			// First step is to get at the CTWorksheet bean underlying the worksheet.
+			ctWorksheet = tempSheet.getCTWorksheet();
+			// From the CTWorksheet, get at the sheet views.
+			ctSheetViews = ctWorksheet.getSheetViews();
+			// Grab a single sheet view from that array
+			ctSheetView = ctSheetViews.getSheetViewArray(ctSheetViews.sizeOfSheetViewArray() - 1);
+			// Se the address of the top left hand cell.
+			ctSheetView.setTopLeftCell("A1");
+		} else {
+			sheet.setActiveCell(new CellAddress("A1"));
+			sheet.showInPane(0, 0);
+		}
 	}
 
 	//
