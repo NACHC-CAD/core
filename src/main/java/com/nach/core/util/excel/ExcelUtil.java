@@ -62,7 +62,21 @@ public class ExcelUtil {
 			throw new RuntimeException(exp);
 		}
 	}
-
+	
+	public static Workbook createNewWorkbook(boolean streaming) {
+		try {
+			if(streaming) {
+				SXSSFWorkbook book = new SXSSFWorkbook();
+				return book;
+			} else {
+				XSSFWorkbook book = new XSSFWorkbook();
+				return book;
+			}
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 	/**
 	 * 
 	 * Create a workbook object in memeory for the given file.
@@ -446,6 +460,10 @@ public class ExcelUtil {
 	 * 
 	 */
 	public static void saveAsCsv(Sheet sheet, File target) {
+		if(sheet instanceof XSSFSheet == false) {
+			String msg = XSSFSheet.class.getName() + " required, " + sheet.getClass().getName() + " found.";
+			throw new RuntimeException("Need to use streaming write for streaming implementations.");
+		}
 		CSVPrinter csvPrinter = null;
 		try {
 			// create the csvPrinter
@@ -463,8 +481,11 @@ public class ExcelUtil {
 			csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT);
 			// iterate over each row
 			Iterator<Row> rowIterator = sheet.rowIterator();
+			log.info("writing csv");
+			int rowCnt = -1;
 			while (rowIterator.hasNext()) {
 				Row row = rowIterator.next();
+				rowCnt++;
 				// iterate over each cell
 				Iterator<Cell> cellIterator = row.cellIterator();
 				while (cellIterator.hasNext()) {
@@ -474,6 +495,7 @@ public class ExcelUtil {
 				csvPrinter.println();
 			}
 			csvPrinter.flush();
+			log.info("Wrote " + rowCnt + " lines");
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		} finally {
