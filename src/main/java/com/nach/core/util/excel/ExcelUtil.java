@@ -349,7 +349,7 @@ public class ExcelUtil {
 		if (val != null) {
 			cell.setCellValue(val);
 		} else {
-			cell.setCellValue("");
+			cell.setCellValue((String) null);
 		}
 	}
 
