@@ -365,7 +365,7 @@ public class ExcelUtil {
 		if (val != null) {
 			cell.setCellValue(val);
 		} else {
-			cell.setCellValue("");
+			cell.setCellValue((String) null);
 		}
 	}
 
@@ -385,7 +385,7 @@ public class ExcelUtil {
 		}
 		Cell cell = row.createCell(col);
 		if (intVal == null) {
-			cell.setCellValue("");
+			cell.setCellValue((String) null);
 		} else {
 			cell.setCellValue(intVal);
 		}
@@ -398,7 +398,7 @@ public class ExcelUtil {
 		}
 		Cell cell = row.createCell(col);
 		if (dubVal == null) {
-			cell.setCellValue("");
+			cell.setCellValue((String) null);
 		} else {
 			cell.setCellValue(dubVal);
 		}
