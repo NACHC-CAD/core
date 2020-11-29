@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +159,12 @@ public class HttpRequestClient {
 		this.client = new DefaultHttpClient();
 		this.client.getParams().setParameter(AuthPNames.TARGET_AUTH_PREF, authtypes);
 	}
-
+	
+	public void addBasicAuthentication(String uid, String pwd) {
+		String enc = Base64.getEncoder().encodeToString((uid + ":" + pwd).getBytes());
+		this.addHeader("Authorization", "Basic " + enc);
+	}
+	
 	//
 	// get
 	//
