@@ -182,6 +182,14 @@ public class ExcelUtil {
 		return sheet.getRow(row).getCell(col);
 	}
 
+	public static Cell getFirstCell(Sheet sheet) {
+		int rowNum = sheet.getFirstRowNum();
+		Row row = sheet.getRow(rowNum);
+		int colNum = row.getFirstCellNum();
+		Cell cell = sheet.getRow(rowNum).getCell(colNum);
+		return cell;
+	}
+	
 	//
 	// cell type method
 	//

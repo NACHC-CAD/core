@@ -76,6 +76,18 @@ public class DatabricksFileUtil {
 		return response;
 	}
 
+	public List<String> listFileNames(String dirPath) {
+		ArrayList<String> rtn = new ArrayList<String> ();
+		String json = list(dirPath);
+		List<String> files = JsonUtil.getJsonArray(json, "files");
+		for(String fileJson : files) {
+			String path = JsonUtil.getString(fileJson, "path");
+			path = path.substring(path.lastIndexOf("/") + 1, path.length());
+			rtn.add(path);
+		}
+		return rtn;
+	}
+	
 	/**
 	 * 
 	 * Method to put a file on the server. The filePath is the path with out the
