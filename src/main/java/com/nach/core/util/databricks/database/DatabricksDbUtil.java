@@ -166,7 +166,9 @@ public class DatabricksDbUtil {
 		for (Row row : data) {
 			String str = row.get("namespace");
 			if (str != null && str.toLowerCase().equals("cosmos") == false && str.toLowerCase().equals("default") == false) {
-				rtn.add(str);
+				if(str.startsWith("this_is_") == false) {
+					rtn.add(str);
+				}
 			}
 		}
 		return rtn;
