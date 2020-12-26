@@ -121,7 +121,11 @@ public class DatabricksDbUtil {
 	 * 
 	 */
 	public static void dropTable(String schemaName, String tableName, Connection conn) {
-		String sqlString = "drop table if exists " + schemaName + "." + tableName;
+		dropTable(schemaName + "." + tableName, conn);
+	}
+
+	public static void dropTable(String fullyQualifiedName, Connection conn) {
+		String sqlString = "drop table if exists " + fullyQualifiedName;
 		Database.update(sqlString, conn);
 	}
 
