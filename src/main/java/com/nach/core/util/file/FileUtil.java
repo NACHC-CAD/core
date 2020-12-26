@@ -249,6 +249,12 @@ public class FileUtil {
 		return rtn;
 	}
 
+	public static List<File> listFiles(String fileName, String pattern) {
+		File file = new File(fileName);
+		return listFiles(file, pattern);
+	}
+
+	
 	public static List<File> listFiles(File file, String pattern) {
 		List<File> rtn = new ArrayList<File>();
 		DirectoryScanner scanner = new DirectoryScanner();

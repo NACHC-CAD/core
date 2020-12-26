@@ -461,6 +461,21 @@ public class ExcelUtil {
 	// persistence methods
 	//
 
+	public static void saveAsCsv(File excelSrc) {
+		Workbook book = getWorkbook(excelSrc);
+		Sheet sheet = book.getSheetAt(0);
+		String fileName = FileUtil.getPrefix(excelSrc);
+		fileName = fileName + ".csv";
+		File target = new File(excelSrc.getParent(), fileName);
+		saveAsCsv(sheet, target);
+	}
+	
+	public static void saveAsCsv(File excelSrc, File target) {
+		Workbook book = getWorkbook(excelSrc);
+		Sheet sheet = book.getSheetAt(0);
+		saveAsCsv(sheet, target);
+	}
+	
 	/**
 	 * 
 	 * Write a spreadsheet to a csv file. If the file exists it will be over
