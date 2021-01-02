@@ -33,4 +33,20 @@ public class StringUtil {
 		return str;
 	}
 	
+	public static boolean isEmpty(String str) {
+		if(str == null) {
+			return true;
+		} else {
+			return StringUtils.isEmpty(str.trim());
+		}
+	}
+	
+	public static Integer parseInt(String str) {
+		try {
+			return Integer.parseInt(str);
+		} catch(Exception exp) {
+			return null;
+		}
+	}
+	
 }
