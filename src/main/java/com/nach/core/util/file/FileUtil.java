@@ -224,6 +224,17 @@ public class FileUtil {
 		}
 	}
 
+	public static String getSuffix(File file) {
+		String name = file.getName();
+		int start = name.lastIndexOf(".");
+		if (start < 0) {
+			return "";
+		} else {
+			String rtn = name.substring(start, file.getName().length());
+			return rtn;
+		}
+	}
+
 	public static String changeSuffix(File file, String suffix) {
 		String fileName = getPrefix(file);
 		String rtn = fileName + "." + suffix;

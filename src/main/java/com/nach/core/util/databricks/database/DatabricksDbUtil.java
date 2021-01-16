@@ -178,4 +178,9 @@ public class DatabricksDbUtil {
 		return rtn;
 	}
 
+	public static void initParsePolicy(Connection dbConn) {
+		Database.query("set spark.sql.legacy.timeParserPolicy = LEGACY", dbConn);
+		Database.query("set spark.sql.legacy.parquet.datetimeRebaseModeInWrite = LEGACY", dbConn);
+	}
+
 }
