@@ -86,6 +86,7 @@ public class DatabricksDbUtil {
 			}
 			String sqlString = "drop database if exists " + schemaName;
 			Database.update(sqlString, conn);
+			log.info("Done doing drop");
 		}
 	}
 
