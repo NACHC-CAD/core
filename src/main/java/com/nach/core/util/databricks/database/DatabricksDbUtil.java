@@ -8,7 +8,9 @@ import java.util.Map;
 
 import org.yaorma.database.Data;
 import org.yaorma.database.Database;
+import org.yaorma.database.DatabaseConnectionManager;
 import org.yaorma.database.Row;
+import org.yaorma.util.time.TimeUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -50,8 +52,8 @@ public class DatabricksDbUtil {
 	 * Does a database exist.
 	 * 
 	 */
-	public static boolean databaseExists(String schemaName, Connection conn) {
-		Data data = showSchemas(conn);
+	public static boolean databaseExists(String schemaName, Connection conn, DatabaseConnectionManager mgr) {
+		Data data = showSchemas(mgr);
 		for (Map<String, String> row : data) {
 			String namespace = row.get("namespace");
 			if (schemaName.equalsIgnoreCase(namespace)) {
@@ -66,10 +68,27 @@ public class DatabricksDbUtil {
 	 * Get a list of the existing databases.
 	 * 
 	 */
-	public static Data showSchemas(Connection conn) {
-		String sqlString = "show schemas";
-		Data rtn = Database.query(sqlString, conn);
-		return rtn;
+	public static Data showSchemas(DatabaseConnectionManager mgr) {
+		for(int i=0;i<3;i++) {
+			try {
+				Connection conn = mgr.getConnection("databricks");
+				String sqlString = "show schemas";
+				Data rtn = Database.query(sqlString, conn);
+				return rtn;
+			} catch(Exception exp) {
+				if(mgr != null) {
+					mgr.resetConnections();
+				} else {
+					TimeUtil.sleep(5);
+				}
+				if(i == 2) {
+					throw new RuntimeException(exp);
+				} else {
+					continue;
+				}
+			}
+		}
+		throw new RuntimeException("Could not connect");
 	}
 
 	/**
@@ -77,8 +96,8 @@ public class DatabricksDbUtil {
 	 * Drop a database.
 	 * 
 	 */
-	public static void dropDatabase(String schemaName, Connection conn) {
-		if (databaseExists(schemaName, conn) == true) {
+	public static void dropDatabase(String schemaName, Connection conn, DatabaseConnectionManager mgr) {
+		if (databaseExists(schemaName, conn, mgr) == true) {
 			Data data = showTables(schemaName, conn);
 			for (Map<String, String> row : data) {
 				String tableName = row.get("tablename");
@@ -86,7 +105,7 @@ public class DatabricksDbUtil {
 			}
 			String sqlString = "drop database if exists " + schemaName;
 			Database.update(sqlString, conn);
-			log.info("Done doing drop");
+			log.info("Done doing drop: " + schemaName);
 		}
 	}
 

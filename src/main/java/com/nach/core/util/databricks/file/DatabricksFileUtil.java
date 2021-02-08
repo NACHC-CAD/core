@@ -11,6 +11,7 @@ import org.yaorma.util.time.Timer;
 import com.nach.core.util.databricks.file.exception.DatabricksFileException;
 import com.nach.core.util.databricks.file.response.DatabricksFileUtilResponse;
 import com.nach.core.util.file.FileUtil;
+import com.nach.core.util.http.HttpFileUpload3;
 import com.nach.core.util.http.HttpRequestClient;
 import com.nach.core.util.json.JsonUtil;
 
@@ -95,9 +96,39 @@ public class DatabricksFileUtil {
 	 * 
 	 */
 	public DatabricksFileUtilResponse put(String databricksDirPath, File file) {
-		return put(databricksDirPath, file, false);
+		// return put(databricksDirPath, file, false);
+		return putLargeFile(databricksDirPath, file);
 	}
 
+	public DatabricksFileUtilResponse putLargeFile(String databricksDirPath, File file) {
+		log.info("* * * UPLOADING FILE USING METHOD FOR LARGE FILES * * *");
+		log.info("File Path: " + FileUtil.getCanonicalPath(file));
+		log.info("File: " + file.getName());
+		log.info("SIZE: " + FileUtil.getSize(file));
+		Timer timer = new Timer();
+		timer.getStart();
+		String databricksFilePath = databricksDirPath + "/" + file.getName();
+		boolean success = HttpFileUpload3.uploadFile(this.baseUrl, token, databricksFilePath, file);
+		timer.getStop();
+		DatabricksFileUtilResponse resp = new DatabricksFileUtilResponse();
+		resp.setStartTime(timer.getStart());
+		resp.setEndTime(timer.getStop());
+		resp.setDatabricksFilePath(databricksDirPath + "/" + file.getName());
+		resp.setElapsedSeconds(timer.getElapsed());
+		resp.setElapsedTime(timer.getElapsedInMilliseconds());
+		resp.setEndTimeString(timer.getElapsedString());
+		resp.setFileExists(file.exists());
+		resp.setFileName(file.getName());
+		resp.setFilePath(FileUtil.getCanonicalPath(file));
+		resp.setFileSize(file.length());
+		resp.setResponse("Not Implemented");
+		resp.setStartTimeString(timer.getStartAsString());
+		resp.setStatusCode(0);
+		resp.setSuccess(success);
+		resp.setUrl(this.baseUrl);
+		return resp;
+	}
+	
 	/**
 	 * 
 	 * Put a file on the server. Replace existing file if replace if file exists on
@@ -124,15 +155,19 @@ public class DatabricksFileUtil {
 		if (replace == true) {
 			client.addFormData("overwrite", "true");
 		}
+		log.info("Doing post");
 		client.postFile(file, filePath, replace);
+		log.info("Done with post");
 		// create rtn object
 		timer.stop();
+		log.info("Getting response");
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
 		rtn.init(client, file, timer, filePath);
 		if (rtn.isSuccess() == false) {
 			log.info(rtn.isSuccess() + ": (" + rtn.getStatusCode() + ") " + rtn.getDatabricksFilePath() + "\t" + rtn.getResponse());
 			throw new RuntimeException("Put failed for " + databricksDirPath, new DatabricksFileException(rtn));
 		}
+		log.info("Got response");
 		return rtn;
 	}
 

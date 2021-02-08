@@ -94,6 +94,7 @@ public class FileUtil {
 	public static String getAsString(File file) {
 		InputStream is = null;
 		try {
+			is = new FileInputStream(file);
 			String rtn = getAsString(is);
 			return rtn;
 		} catch (Exception exp) {
