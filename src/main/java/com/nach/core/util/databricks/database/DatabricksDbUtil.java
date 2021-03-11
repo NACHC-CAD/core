@@ -56,6 +56,9 @@ public class DatabricksDbUtil {
 		Data data = showSchemas(mgr);
 		for (Map<String, String> row : data) {
 			String namespace = row.get("namespace");
+			if(namespace == null) {
+				namespace = row.get("databasename");
+			}
 			if (schemaName.equalsIgnoreCase(namespace)) {
 				return true;
 			}
@@ -189,6 +192,9 @@ public class DatabricksDbUtil {
 		ArrayList<String> rtn = new ArrayList<String>();
 		for (Row row : data) {
 			String str = row.get("namespace");
+			if (str == null) {
+				str = row.get("databasename");
+			}
 			if (str != null && str.toLowerCase().equals("cosmos") == false && str.toLowerCase().equals("default") == false) {
 				if(str.startsWith("this_is_") == false) {
 					rtn.add(str);
