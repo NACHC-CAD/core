@@ -43,6 +43,10 @@ public class FileUtil {
 			rootDirName = rootDirName.replace("test-classes", "classes");
 		}
 		File rtn = new File(rootDirName, name);
+		if(rtn.exists() == false) {
+			rootDirName = rootDirName.replace("test-classes", "classes");
+			rtn = new File(rootDirName, name);
+		}
 		return rtn;
 	}
 
