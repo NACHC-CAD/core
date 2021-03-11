@@ -39,11 +39,11 @@ public class FileUtil {
 	public static File getFile(String name, boolean swapOutMvnTestClasses) {
 		String filePath = "/";
 		String rootDirName = FileUtil.class.getResource(filePath).getPath();
-		if(swapOutMvnTestClasses == true) {
+		if (swapOutMvnTestClasses == true) {
 			rootDirName = rootDirName.replace("test-classes", "classes");
 		}
 		File rtn = new File(rootDirName, name);
-		if(rtn.exists() == false) {
+		if (rtn.exists() == false) {
 			rootDirName = rootDirName.replace("test-classes", "classes");
 			rtn = new File(rootDirName, name);
 		}
@@ -207,7 +207,7 @@ public class FileUtil {
 		try {
 			InputStream initialStream = new ByteArrayInputStream(string.getBytes());
 			FileUtils.copyInputStreamToFile(initialStream, file);
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
@@ -245,7 +245,7 @@ public class FileUtil {
 		String rtn = fileName + "." + suffix;
 		return rtn;
 	}
-	
+
 	// * * *
 	//
 	// DIRECTORY METHODS
@@ -270,11 +270,26 @@ public class FileUtil {
 		return listFiles(file, pattern);
 	}
 
-	
 	public static List<File> listFiles(File file, String pattern) {
 		List<File> rtn = new ArrayList<File>();
 		DirectoryScanner scanner = new DirectoryScanner();
 		scanner.setIncludes(new String[] { pattern });
+		scanner.setBasedir(file);
+		scanner.setCaseSensitive(false);
+		scanner.scan();
+		String[] files = scanner.getIncludedFiles();
+		for (String str : files) {
+			rtn.add(new File(file, str));
+		}
+		rtn = sortByName(rtn);
+		return rtn;
+	}
+
+	public static List<File> listFiles(File file, String pattern, String excludesPattern) {
+		List<File> rtn = new ArrayList<File>();
+		DirectoryScanner scanner = new DirectoryScanner();
+		scanner.setIncludes(new String[] { pattern });
+		scanner.setExcludes(new String[] { excludesPattern });
 		scanner.setBasedir(file);
 		scanner.setCaseSensitive(false);
 		scanner.scan();
@@ -308,6 +323,16 @@ public class FileUtil {
 		return rtn;
 	}
 
+	public static List<File> removeStartsWith(List<File> files, String startsWith) {
+		ArrayList<File> rtn = new ArrayList<File>();
+		for(File file : files) {
+			if(file.getName().startsWith(startsWith) == false) {
+				rtn.add(file);
+			}
+		}
+		return rtn;
+	}
+	
 	//
 	// sort a list of files by name
 	//
@@ -392,7 +417,7 @@ public class FileUtil {
 
 	public static String getCanonicalPath(File file) {
 		try {
-			if(file == null) {
+			if (file == null) {
 				return null;
 			} else {
 				return file.getCanonicalPath();
