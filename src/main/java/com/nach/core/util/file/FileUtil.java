@@ -226,8 +226,7 @@ public class FileUtil {
 	//
 	// * * *
 
-	public static String getPrefix(File file) {
-		String name = file.getName();
+	public static String getPrefix(String name) {
 		int end = name.lastIndexOf(".");
 		if (end < 0) {
 			return name;
@@ -236,14 +235,23 @@ public class FileUtil {
 			return rtn;
 		}
 	}
+	
+	public static String getPrefix(File file) {
+		String name = file.getName();
+		return getPrefix(name);
+	}
 
 	public static String getSuffix(File file) {
 		String name = file.getName();
+		return getSuffix(name);
+	}
+
+	public static String getSuffix(String name) {
 		int start = name.lastIndexOf(".");
 		if (start < 0) {
 			return "";
 		} else {
-			String rtn = name.substring(start, file.getName().length());
+			String rtn = name.substring(start, name.length());
 			return rtn;
 		}
 	}
