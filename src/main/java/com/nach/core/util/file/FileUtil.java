@@ -212,6 +212,14 @@ public class FileUtil {
 		}
 	}
 
+	public static void write(InputStream inputStream, File file) {
+		try {
+			FileUtils.copyInputStreamToFile(inputStream, file);
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
 	// * * *
 	//
 	// FILE NAME METHODS
