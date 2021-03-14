@@ -15,15 +15,20 @@ public class PropertiesUtil {
 	 * "/com/mypackage/my-info.props".
 	 */
 	public static Properties getAsProperties(String fileName) {
-		return getAsProperties(FileUtil.getFile(fileName));
+		InputStream is =  new PropertiesUtil().getClass().getClassLoader().getResourceAsStream(fileName);
+		return getAsProperties(is, fileName);
 	}
 
 	public static Properties getAsProperties(File file) {
+		InputStream in = FileUtil.getInputStream(file);
+		return getAsProperties(in, FileUtil.getCanonicalPath(file));
+	}
+
+	public static Properties getAsProperties(InputStream in, String fileName) {
 		try {
 			Properties props = new Properties();
-			InputStream in = FileUtil.getInputStream(file);
 			if (in == null) {
-				throw new RuntimeException("Could not get InputStream for file: " + file.getCanonicalPath());
+				throw new RuntimeException("Could not get InputStream for file: " + fileName);
 			}
 			props.load(in);
 			return props;
