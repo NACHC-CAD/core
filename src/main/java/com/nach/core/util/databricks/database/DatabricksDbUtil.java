@@ -80,7 +80,9 @@ public class DatabricksDbUtil {
 				return rtn;
 			} catch(Exception exp) {
 				if(mgr != null) {
-					mgr.resetConnections();
+					// mgr.resetConnections();
+					exp.printStackTrace();
+					log.info("UNEXPECTED CONNECTION EXCEPTION (waiting 5 seconds and retrying)");
 				} else {
 					TimeUtil.sleep(5);
 				}
