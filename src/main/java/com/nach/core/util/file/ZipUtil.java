@@ -9,42 +9,55 @@ import java.util.zip.ZipInputStream;
 
 public class ZipUtil {
 
-	public static void unzip(File zipFile, File dstDir) {
+	public static File unzip(File zipFile, File destDir) {
 		try {
-			// create output directory if it doesn't exist
-			if (dstDir.exists() == false) {
-				dstDir.mkdirs();
-			}
-			FileInputStream fis;
-			// buffer for read and write data to file
 			byte[] buffer = new byte[1024];
-			fis = new FileInputStream(zipFile);
-			ZipInputStream zis = new ZipInputStream(fis);
-			ZipEntry ze = zis.getNextEntry();
-			while (ze != null) {
-				String fileName = ze.getName();
-				File newFile = new File(dstDir, fileName);
-				System.out.println("Unzipping to " + newFile.getAbsolutePath());
-				// create directories for sub directories in zip
-				new File(newFile.getParent()).mkdirs();
-				FileOutputStream fos = new FileOutputStream(newFile);
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-					fos.write(buffer, 0, len);
+			ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
+			ZipEntry zipEntry = zis.getNextEntry();
+			File rtn = null;
+			int cnt = 0;
+			while (zipEntry != null) {
+				cnt++;
+				File newFile = newFile(destDir, zipEntry);
+				if(cnt == 1) {
+					rtn = newFile;
 				}
-				fos.close();
-				// close this ZipEntry
-				zis.closeEntry();
-				ze = zis.getNextEntry();
+				if (zipEntry.isDirectory()) {
+					if (!newFile.isDirectory() && !newFile.mkdirs()) {
+						throw new IOException("Failed to create directory " + newFile);
+					}
+				} else {
+					// fix for Windows-created archives
+					File parent = newFile.getParentFile();
+					if (!parent.isDirectory() && !parent.mkdirs()) {
+						throw new IOException("Failed to create directory " + parent);
+					}
+					// write file content
+					FileOutputStream fos = new FileOutputStream(newFile);
+					int len;
+					while ((len = zis.read(buffer)) > 0) {
+						fos.write(buffer, 0, len);
+					}
+					fos.close();
+				}
+				zipEntry = zis.getNextEntry();
 			}
-			// close last ZipEntry
 			zis.closeEntry();
 			zis.close();
-			fis.close();
-		} catch (IOException exp) {
+			return rtn;
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
+	}
 
+	public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+		File destFile = new File(destinationDir, zipEntry.getName());
+		String destDirPath = destinationDir.getCanonicalPath();
+		String destFilePath = destFile.getCanonicalPath();
+		if (!destFilePath.startsWith(destDirPath + File.separator)) {
+			throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+		}
+		return destFile;
 	}
 
 }
