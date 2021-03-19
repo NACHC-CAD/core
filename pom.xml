@@ -4,7 +4,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<build.version>1.0.4-001</build.version>
+		<build.version>1.0.4-SNAPSHOT</build.version>
 	</properties>
 
 	<modelVersion>4.0.0</modelVersion>

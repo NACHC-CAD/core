@@ -16,6 +16,9 @@ public class PropertiesUtil {
 	 */
 	public static Properties getAsProperties(String fileName) {
 		InputStream is =  new PropertiesUtil().getClass().getClassLoader().getResourceAsStream(fileName);
+		if(is == null) {
+			is = FileUtil.getInputStream(fileName);
+		}
 		return getAsProperties(is, fileName);
 	}
 
