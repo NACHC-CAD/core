@@ -8,7 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HeadIntegrationTest {
-
+	/*
 	@Test
 	public void shouldGetFirstRows() {
 		log.info("Starting test...");
@@ -20,5 +20,5 @@ public class HeadIntegrationTest {
 		log.info("Got String: \n" + str);
 		log.info("Done.");
 	}
-
+	*/
 }

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Properties;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.DirectoryScanner;
@@ -46,9 +45,9 @@ public class FileUtil {
 		if (rtn.exists() == false) {
 			rootDirName = rootDirName.replace("test-classes", "classes");
 			File temp = new File(rootDirName, name);
-			
-			//Only move to classes if file exists there, otherwise, stay in test-classes
-			if(temp.exists()){
+
+			// Only move to classes if file exists there, otherwise, stay in test-classes
+			if (temp.exists()) {
 				rtn = temp;
 			}
 		}
@@ -239,7 +238,7 @@ public class FileUtil {
 			return rtn;
 		}
 	}
-	
+
 	public static String getPrefix(File file) {
 		String name = file.getName();
 		return getPrefix(name);
@@ -260,7 +259,7 @@ public class FileUtil {
 		}
 	}
 
-	//Doesn't Change the suffix. Just Returns a string with new file name.
+	// Doesn't Change the suffix. Just Returns a string with new file name.
 	public static String changeSuffix(File file, String suffix) {
 		String fileName = getPrefix(file);
 		String rtn = fileName + "." + suffix;
@@ -346,14 +345,14 @@ public class FileUtil {
 
 	public static List<File> removeStartsWith(List<File> files, String startsWith) {
 		ArrayList<File> rtn = new ArrayList<File>();
-		for(File file : files) {
-			if(file.getName().startsWith(startsWith) == false) {
+		for (File file : files) {
+			if (file.getName().startsWith(startsWith) == false) {
 				rtn.add(file);
 			}
 		}
 		return rtn;
 	}
-	
+
 	//
 	// sort a list of files by name
 	//
