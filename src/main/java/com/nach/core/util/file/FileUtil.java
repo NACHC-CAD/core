@@ -45,7 +45,12 @@ public class FileUtil {
 		File rtn = new File(rootDirName, name);
 		if (rtn.exists() == false) {
 			rootDirName = rootDirName.replace("test-classes", "classes");
-			rtn = new File(rootDirName, name);
+			File temp = new File(rootDirName, name);
+			
+			//Only move to classes if file exists there, otherwise, stay in test-classes
+			if(temp.exists()){
+				rtn = temp;
+			}
 		}
 		return rtn;
 	}
@@ -126,7 +131,6 @@ public class FileUtil {
 	 */
 	public static InputStream getInputStream(String fileName) {
 		try {
-			Properties props = new Properties();
 			InputStream in = FileUtil.class.getResourceAsStream(fileName);
 			return in;
 		} catch (Exception exp) {
@@ -251,11 +255,12 @@ public class FileUtil {
 		if (start < 0) {
 			return "";
 		} else {
-			String rtn = name.substring(start, name.length());
+			String rtn = name.substring(start + 1, name.length());
 			return rtn;
 		}
 	}
 
+	//Doesn't Change the suffix. Just Returns a string with new file name.
 	public static String changeSuffix(File file, String suffix) {
 		String fileName = getPrefix(file);
 		String rtn = fileName + "." + suffix;
