@@ -25,11 +25,21 @@ public class ZipUtilUnzipIntegrationTest {
 		log.info("Unzipping file");
 		File zipFile = FileUtil.getFile(SRC_FILE_NAME);
 		File dstDir = FileUtil.getFile(UNZIPPED_DIR_NAME);
+		File targetFile = FileUtil.getFile(TARGET_CSV);
+		
+		if(targetFile.exists()) {
+			log.info("Target file already exists; deleting...");
+			targetFile.delete();
+		}
+		
+		
 		log.info("Writing zip file to: " + dstDir.getCanonicalPath());
 		ZipUtil.unzip(zipFile, dstDir);
-		File targetFile = FileUtil.getFile(TARGET_CSV);
 		log.info("Looking for file at: " + targetFile.getCanonicalPath());
 		assertTrue(targetFile.exists());
+		assertTrue(FileUtil.getSize(targetFile) > 0);
+		log.info("Cleaning up...");
+		targetFile.delete();
 		log.info("Done.");
 	}
 
