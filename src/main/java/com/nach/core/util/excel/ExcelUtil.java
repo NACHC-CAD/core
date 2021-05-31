@@ -513,7 +513,9 @@ public class ExcelUtil {
 				Iterator<Cell> cellIterator = row.cellIterator();
 				while (cellIterator.hasNext()) {
 					Cell cell = cellIterator.next();
-					csvPrinter.print(cell.getStringCellValue());
+					// csvPrinter.print(cell.getStringCellValue());
+					String str = ExcelUtil.getStringValue(cell);
+					csvPrinter.print(str);
 				}
 				csvPrinter.println();
 			}

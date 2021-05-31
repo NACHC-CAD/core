@@ -102,6 +102,10 @@ public class DatabricksDbUtil {
 	 * Drop a database.
 	 * 
 	 */
+	public static void dropDatabase(String schemaName, DatabaseConnectionManager mgr) {
+		dropDatabase(schemaName, mgr.getConnection("databricks"), mgr);
+	}
+	
 	public static void dropDatabase(String schemaName, Connection conn, DatabaseConnectionManager mgr) {
 		if (databaseExists(schemaName, conn, mgr) == true) {
 			Data data = showTables(schemaName, conn);
@@ -120,6 +124,10 @@ public class DatabricksDbUtil {
 	 * Create a database.
 	 * 
 	 */
+	public static void createDatabase(String databaseName, DatabaseConnectionManager mgr) {
+		createDatabase(databaseName, mgr.getConnection("databricks"));
+	}
+	
 	public static void createDatabase(String databaseName, Connection conn) {
 		String sqlString = "create database " + databaseName;
 		Database.update(sqlString, conn);

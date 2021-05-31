@@ -60,7 +60,8 @@ public class HttpFileUpload3 {
 		BufferedReader reader = null;
 		try {
 			log.info("handleMsg: " + handleMsg);
-			String handle = JsonUtil.getString(handleMsg, "handle");
+			String handle = JsonUtil.getAsString(handleMsg, "handle");
+			log.info("HANDLE: " + handle);
 			InputStream in = new FileInputStream(file);
 			reader = new BufferedReader(new InputStreamReader(in));
 			String nextLine = reader.readLine();
@@ -119,8 +120,9 @@ public class HttpFileUpload3 {
 		client.setOauthToken(token);
 		client.doPost(msg);
 		int status = client.getStatusCode();
-		log.debug("Status: " + status);
-		log.debug("Got response: " + client.getResponse().trim());
+		log.debug("Sending message");
+		log.debug("Write Block Status:   " + status);
+		log.debug("Write Block Response: " + client.getResponse().trim());
 		log.debug("Done sending message.");
 		return status;
 	}

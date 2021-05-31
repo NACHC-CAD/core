@@ -12,15 +12,24 @@ import com.nach.core.util.file.FileUtil;
 
 public class JsonUtil {
 
+	public static String getAsString(String json, String key) {
+		try {
+			JSONObject obj = new JSONObject(json);
+			return obj.getString(key);
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
 	public static String getString(String json, String key) {
 		try {
 			JSONObject obj = new JSONObject(json);
 			try {
 				return obj.getInt(key) + "";
-			} catch(Exception exp) {
+			} catch (Exception exp) {
 				return obj.getString(key);
 			}
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
@@ -31,7 +40,7 @@ public class JsonUtil {
 			JSONArray array = obj.getJSONArray(key);
 			List<String> rtn = toArrayList(array);
 			return rtn;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			return new ArrayList<String>();
 		}
 	}
@@ -74,7 +83,7 @@ public class JsonUtil {
 				}
 			}
 			return rtn;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
@@ -106,7 +115,7 @@ public class JsonUtil {
 			JSONArray jsonArray = jsonObj.getJSONArray(name);
 			ArrayList<JSONObject> rtn = toJsonObjectArrayList(jsonArray);
 			return rtn;
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
@@ -172,7 +181,7 @@ public class JsonUtil {
 			try {
 				JSONArray array = new JSONArray(json);
 				return array.toString();
-			} catch(Exception exp2) {
+			} catch (Exception exp2) {
 				throw new RuntimeException(exp2);
 			}
 		}
