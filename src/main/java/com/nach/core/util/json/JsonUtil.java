@@ -172,7 +172,7 @@ public class JsonUtil {
 	/**
 	 * Unprettyprint a file.
 	 */
-	public String removeWhiteSpaces(File file) {
+	public static String removeWhiteSpaces(File file) {
 		String json = FileUtil.getAsString(file);
 		try {
 			JSONObject obj = new JSONObject(json);
