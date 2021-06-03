@@ -79,7 +79,7 @@ public class ExcelUtil {
 	
 	/**
 	 * 
-	 * Create a workbook object in memeory for the given file.
+	 * Create a workbook object in memory for the given file.
 	 * 
 	 */
 	public static Workbook getWorkbook(File file) {
