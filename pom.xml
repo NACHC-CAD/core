@@ -214,6 +214,16 @@
 		    <version>5.2</version>
 		</dependency>
 
+		<!-- 
+		More info here: https://www.callicoder.com/java-read-write-csv-file-apache-commons-csv/
+		 -->
+		 
+		<dependency>
+		    <groupId>org.apache.commons</groupId>
+		    <artifactId>commons-csv</artifactId>
+		    <version>1.5</version>
+		</dependency>
+
 	</dependencies>
 
 	<!-- 

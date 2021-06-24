@@ -249,6 +249,22 @@ public class FileUtil {
 		return getSuffix(name);
 	}
 
+	public static String appendToFileName(File srcFile, String str) {
+		String prefix = FileUtil.getPrefix(srcFile);
+		String suffix = FileUtil.getSuffix(srcFile);
+		String name = prefix + str + "." + suffix;
+		return name;
+	}
+	
+	public static File createFileWithAppendedName(File srcFile, String str) {
+		File root = srcFile.getParentFile();
+		String prefix = FileUtil.getPrefix(srcFile);
+		String suffix = FileUtil.getSuffix(srcFile);
+		String name = prefix + str + "." + suffix;
+		File file = new File(root, name);
+		return file;
+	}
+	
 	public static String getSuffix(String name) {
 		int start = name.lastIndexOf(".");
 		if (start < 0) {
