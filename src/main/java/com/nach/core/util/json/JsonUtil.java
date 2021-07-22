@@ -15,7 +15,13 @@ public class JsonUtil {
 	public static String getAsString(String json, String key) {
 		try {
 			JSONObject obj = new JSONObject(json);
-			return obj.getString(key);
+			String rtn = null;
+			try {
+				rtn = obj.getString(key);
+			} catch(Exception exp) {
+				rtn = obj.getLong(key) + "";
+			}
+			return rtn;
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
