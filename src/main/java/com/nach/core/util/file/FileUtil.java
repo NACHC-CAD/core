@@ -54,6 +54,15 @@ public class FileUtil {
 		return rtn;
 	}
 
+	public static String getCanonicalPath(String filePath) {
+		File file = getFile(filePath);
+		try {
+			return file.getCanonicalPath();
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 	//
 	// get file from project root (based on mvn project)
 	//

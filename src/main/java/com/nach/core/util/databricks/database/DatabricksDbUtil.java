@@ -56,7 +56,7 @@ public class DatabricksDbUtil {
 		Data data = showSchemas(mgr);
 		for (Map<String, String> row : data) {
 			String namespace = row.get("namespace");
-			if(namespace == null) {
+			if (namespace == null) {
 				namespace = row.get("databasename");
 			}
 			if (schemaName.equalsIgnoreCase(namespace)) {
@@ -72,28 +72,43 @@ public class DatabricksDbUtil {
 	 * 
 	 */
 	public static Data showSchemas(DatabaseConnectionManager mgr) {
-		for(int i=0;i<3;i++) {
+		int cnt = 10;
+		for (int i = 0; i < cnt; i++) {
 			try {
 				Connection conn = mgr.getConnection("databricks");
 				String sqlString = "show schemas";
 				Data rtn = Database.query(sqlString, conn);
 				return rtn;
-			} catch(Exception exp) {
-				if(mgr != null) {
-					// mgr.resetConnections();
+			} catch (Exception exp) {
+				if (mgr != null) {
 					log.info(exp.getMessage());
 					log.info("UNEXPECTED CONNECTION EXCEPTION (waiting 5 seconds and retrying)");
 					TimeUtil.sleep(5);
 				} else {
 					TimeUtil.sleep(5);
 				}
-				if(i == 2) {
+				if (i == (cnt - 2)) {
+					// The connection has likely timed out on the Databricks side, an attempt to get a connection should restart the connection
+					log.info("* * * RESETTING CONNECTION * * *");
+					mgr.resetConnections();
+					log.info("Waiting 10 minutes for the connection to reset...");
+					TimeUtil.sleep(10 * 60);
+					log.info("Done sleeping, resetting connections");
+					mgr.resetConnections();
+					log.info("Testing connection:");
+					Data data = Database.query("show schemas", mgr.getConnection("databricks"));
+					log.info("Got " + data.size() + " schemas");
+					return data;
+				}
+				if (i == (cnt - 1)) {
+					log.info("throwing exception");
 					throw new RuntimeException(exp);
 				} else {
 					continue;
 				}
 			}
 		}
+		log.info("throwing exception");
 		throw new RuntimeException("Could not connect");
 	}
 
@@ -105,7 +120,7 @@ public class DatabricksDbUtil {
 	public static void dropDatabase(String schemaName, DatabaseConnectionManager mgr) {
 		dropDatabase(schemaName, mgr.getConnection("databricks"), mgr);
 	}
-	
+
 	public static void dropDatabase(String schemaName, Connection conn, DatabaseConnectionManager mgr) {
 		if (databaseExists(schemaName, conn, mgr) == true) {
 			Data data = showTables(schemaName, conn);
@@ -127,7 +142,7 @@ public class DatabricksDbUtil {
 	public static void createDatabase(String databaseName, DatabaseConnectionManager mgr) {
 		createDatabase(databaseName, mgr.getConnection("databricks"));
 	}
-	
+
 	public static void createDatabase(String databaseName, Connection conn) {
 		String sqlString = "create database " + databaseName;
 		Database.update(sqlString, conn);
@@ -207,7 +222,7 @@ public class DatabricksDbUtil {
 				str = row.get("databasename");
 			}
 			if (str != null && str.toLowerCase().equals("cosmos") == false && str.toLowerCase().equals("default") == false) {
-				if(str.startsWith("this_is_") == false) {
+				if (str.startsWith("this_is_") == false) {
 					rtn.add(str);
 				}
 			}

@@ -59,8 +59,11 @@ public class HttpFileUpload3 {
 	private static void writeFile(String url, String token, String handleMsg, File file) {
 		BufferedReader reader = null;
 		try {
+			log.info("--------------------");
 			log.info("handleMsg: " + handleMsg);
+			log.info("parsing json");
 			String handle = JsonUtil.getAsString(handleMsg, "handle");
+			log.info("json successfully parsed");
 			log.info("HANDLE: " + handle);
 			InputStream in = new FileInputStream(file);
 			reader = new BufferedReader(new InputStreamReader(in));
