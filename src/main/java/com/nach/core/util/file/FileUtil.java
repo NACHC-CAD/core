@@ -7,11 +7,14 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.tools.ant.DirectoryScanner;
@@ -209,6 +212,16 @@ public class FileUtil {
 		}
 	}
 
+	public static Long getLineCount(File file) {
+		long lineCount;
+		try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
+		  lineCount = stream.count();
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+		return lineCount;
+	}
+	
 	// * * *
 	//
 	// WRITE METHODS

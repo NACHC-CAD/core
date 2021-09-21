@@ -7,27 +7,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Base64;
 
+import com.nach.core.util.file.FileReader;
+import com.nach.core.util.file.FileUtil;
 import com.nach.core.util.json.JsonUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class HttpFileUpload3 {
-
-	public static void main(String[] args) throws Exception {
-		try {
-			log.info("Starting...");
-			String url = "https://nachc-nachc-databricks-dev.cloud.databricks.com/api/2.0";
-			String token = "dapied9d7b92a7cd009aad5568b21ebb23b1";
-			String path = "/FileStore/tables/prod/million-hearts/delete_me/delete_me.txt";
-			// String srcFileName = "C:\\_WORKSPACES\\nachc\\_PROJECT\\cosmos\\million-hearts\\me-med-mapping-2021-02-02\\flat\\he\\HealthEfficient Statin Therapy Medication Output from 1_31_2019 to 7_31_2020.csv";
-			String srcFileName = "C:\\_WORKSPACES\\nachc\\_PROJECT\\cosmos\\million-hearts\\me-med-mapping-2021-02-02\\_ETC\\tail.txt";
-			File file = new File(srcFileName);
-			uploadFile(url, token, path, file);
-		} finally {
-
-		}
-	}
 
 	public static boolean uploadFile(String url, String token, String path, File file) {
 		// write the file
@@ -40,7 +27,7 @@ public class HttpFileUpload3 {
 		log.info("Done.");
 		return true;
 	}
-	
+
 	private static String openConnection(String url, String token, String path) {
 		// open connection
 		log.info("--- OPEN CONNECTION ---");
@@ -57,75 +44,87 @@ public class HttpFileUpload3 {
 	}
 
 	private static void writeFile(String url, String token, String handleMsg, File file) {
-		BufferedReader reader = null;
-		try {
-			log.info("--------------------");
-			log.info("handleMsg: " + handleMsg);
-			log.info("parsing json");
-			String handle = JsonUtil.getAsString(handleMsg, "handle");
-			log.info("json successfully parsed");
-			log.info("HANDLE: " + handle);
-			InputStream in = new FileInputStream(file);
-			reader = new BufferedReader(new InputStreamReader(in));
-			String nextLine = reader.readLine();
-			String msg = "";
-			int cnt = 0;
-			int seg = 0;
-			while (nextLine != null) {
-				cnt++;
-				if ((msg + nextLine).length() > 300000) {
-					seg++;
-					if(seg % 100 == 0) {
-						log.info("File: " + file.length());
-						log.info("Line: " + cnt);
-						log.info("Seg:  " + seg);
-					}
-					msg = Base64.getEncoder().encodeToString(msg.getBytes());
-					msg = "{\"handle\":\"" + handle + "\",\"data\":\"" + msg + "\"}";
-					int status = 0;
-					boolean success = false;
-					for(int i=0;i<3;i++) {
-						status = sendBytes(url, token, handle, msg);
-						if(status == 200) {
-							success = true;
-							break;
-						} 
-					}
-					if(success == false) {
-						throw new RuntimeException("Could not write block: " + url);
-					}
-					msg = nextLine + "\n";
-				} else {
-					msg += nextLine + "\n";
-				}
-				nextLine = reader.readLine();
+		// deal with getting the handle
+		log.info("--------------------");
+		log.info("handleMsg: " + handleMsg);
+		log.info("parsing json");
+		String handle = JsonUtil.getAsString(handleMsg, "handle");
+		log.info("json successfully parsed");
+		log.info("HANDLE: " + handle);
+		// write the file
+		int messageSize = 800000;
+		FileReader reader = new FileReader(file);
+		int segmentCount = 0;
+		long bytesSent = 0;
+		while(reader.getIsDone() == false) {
+			if(segmentCount % 25 == 0) {
+				System.out.println("");
 			}
-			msg = Base64.getEncoder().encodeToString(msg.getBytes());
-			msg = "{\"handle\":\"" + handle + "\",\"data\":\"" + msg + "\"}";
-			sendBytes(url, token, handle, msg);
-		} catch (Exception exp) {
-			throw new RuntimeException(exp);
-		} finally {
-			if (reader != null) {
-				try {
-					reader.close();
-				} catch (Exception exp) {
-					throw new RuntimeException(exp);
+			if(segmentCount % 100 == 0) {
+				log.info("Current Line: " + reader.getCurrentLine());
+				log.info("Total Lines:  " + reader.getTotalLineCount());
+				log.info("Segment:      " + segmentCount);
+				log.info("Bytes Sent:   " + bytesSent);
+			}
+			String msg = reader.getSegment();
+			String msgString = Base64.getEncoder().encodeToString(msg.getBytes());
+			System.out.print(".");
+			msgString = "{\"handle\":\"" + handle + "\",\"data\":\"" + msgString + "\"}";
+			boolean success = false;
+			for(int i=0;i<3;i++) {
+				System.out.print("s");
+				int status = sendBytes(url, token, handle, msgString);
+				if(status == 200) {
+					System.out.print("d");
+					success = true;
+					bytesSent = bytesSent + msgString.length();
+					break;
+				} else {
+					System.out.print("R");
 				}
+			}
+			if(success == false) {
+				throw new RuntimeException("Could not write block: " + url);
+			}
+			System.out.print("+");
+			segmentCount++;
+		}
+		log.info("Writing last segment of file");
+		String msg = reader.getSegment();
+		String msgString = Base64.getEncoder().encodeToString(msg.getBytes());
+		msgString = "{\"handle\":\"" + handle + "\",\"data\":\"" + msgString + "\"}";
+		boolean success = false;
+		for(int i=0;i<3;i++) {
+			System.out.print("s");
+			int status = sendBytes(url, token, handle, msgString);
+			if(status == 200) {
+				System.out.print("d");
+				success = true;
+				break;
+			} else {
+				System.out.print("R");
 			}
 		}
+		if(success == false) {
+			throw new RuntimeException("Could not write block: " + url);
+		}
+		log.info("Current Line: " + reader.getCurrentLine());
+		log.info("Total Lines:  " + reader.getTotalLineCount());
+		log.info("Segment:      " + segmentCount);
+		log.info("Done.");
 	}
 
 	private static int sendBytes(String url, String token, String handle, String msg) {
-		int statusCode;
 		String addBlockUrl = url + "/dbfs/add-block";
 		HttpRequestClient client = new HttpRequestClient(addBlockUrl);
 		client.setOauthToken(token);
 		client.doPost(msg);
 		int status = client.getStatusCode();
-		log.debug("Sending message");
-		log.debug("Write Block Status:   " + status);
-		log.debug("Write Block Response: " + client.getResponse().trim());
+		String responseMessage = client.getResponse().trim();
+		if (status != 200) {
+			log.info("Status: " + status);
+			log.info("Error from server: \n" + responseMessage);
+		}
 		log.debug("Done sending message.");
 		return status;
 	}
