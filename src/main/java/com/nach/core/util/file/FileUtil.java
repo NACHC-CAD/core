@@ -318,8 +318,21 @@ public class FileUtil {
 		File[] fileArray = dir.listFiles();
 		List<File> files = Arrays.asList(fileArray);
 		ArrayList<File> rtn = new ArrayList<File>();
-		rtn.addAll(files);
 		files = sortByName(files);
+		rtn.addAll(files);
+		return rtn;
+	}
+
+	public static List<File> listDirs(File dir) {
+		File[] fileArray = dir.listFiles();
+		List<File> files = Arrays.asList(fileArray);
+		ArrayList<File> rtn = new ArrayList<File>();
+		files = sortByName(files);
+		for(File file: files) {
+			if(file.isDirectory()) {
+				rtn.add(file);
+			}
+		}
 		return rtn;
 	}
 
