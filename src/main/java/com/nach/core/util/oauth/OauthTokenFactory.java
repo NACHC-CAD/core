@@ -22,11 +22,50 @@ public class OauthTokenFactory {
 		return rtn;
 	}
 
-	public static String getToken(String url, String uid, String secret) {
+	public static String getToken(String url, String uid, String secret, String[][] headers, String msg) {
+		return getToken(url, uid, secret, headers, msg, false);
+	}
+
+	
+	public static String getToken(String url, String uid, String secret, String[][] headers, String msg, boolean debug) {
 		try {
 			logger.debug("Getting token");
 			logger.debug("Java version: " + System.getProperty("java.version"));
-			if ("true".equalsIgnoreCase(ApplicationParams.getProperty("java.net.debug"))) {
+			if (debug == true) {
+				System.setProperty("javax.net.debug", "ssl");
+			}
+			HttpRequestClient client = new HttpRequestClient(url);
+			client.addBasicAuthentication(uid, secret);
+			for(String[] header : headers) {
+				client.addHeader(header[0], header[1]);
+			}
+			client.doPost(msg);
+			logger.debug("Doing post");
+			logger.info("Getting token from: " + client.getUrl());
+			client.doPost(msg);
+			String response = client.getResponse();
+			response = JsonUtil.removeWhiteSpaces(response);
+			logger.info("Got response: \n" + response);
+			String rtn = new OAuthTokenResponseParser(response).getToken(response);
+			logger.debug("Done.");
+			return rtn;
+		} catch (Exception exp) {
+			throw (new RuntimeException(exp));
+		} finally {
+			logger.debug("Java version: " + System.getProperty("java.version"));
+			logger.debug("Done.");
+		}
+	}
+
+	public static String getToken(String url, String uid, String secret) {
+		return getToken(url, uid, secret, false);
+	}
+
+	public static String getToken(String url, String uid, String secret, boolean debug) {
+		try {
+			logger.debug("Getting token");
+			logger.debug("Java version: " + System.getProperty("java.version"));
+			if (debug == true) {
 				System.setProperty("javax.net.debug", "ssl");
 			}
 			HttpRequestClient client = new HttpRequestClient(url);
