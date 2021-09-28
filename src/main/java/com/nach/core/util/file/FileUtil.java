@@ -399,8 +399,8 @@ public class FileUtil {
 		List<File> list = Arrays.asList(files);
 		list = sortByName(list);
 		ArrayList<File> rtn = new ArrayList<File>();
-		for (File current : files) {
-			if (file.isDirectory() == false) {
+		for (File current : list) {
+			if (current.isDirectory() == false) {
 				rtn.add(current);
 			}
 		}

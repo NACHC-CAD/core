@@ -58,7 +58,6 @@ public class PatientUtil {
 		List<ContactPoint> cons = patient.getTelecom();
 		for (ContactPoint con : cons) {
 			ContactPointSystem system = con.getSystem();
-			log.info("System: " + system);
 			if (ContactPointSystem.PHONE == system) {
 				rtn = con.getValue();
 				break;
