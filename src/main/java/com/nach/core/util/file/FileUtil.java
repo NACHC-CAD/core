@@ -61,11 +61,11 @@ public class FileUtil {
 		File file = getFile(filePath);
 		try {
 			return file.getCanonicalPath();
-		} catch(Exception exp) {
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
-	
+
 	//
 	// get file from project root (based on mvn project)
 	//
@@ -215,13 +215,13 @@ public class FileUtil {
 	public static Long getLineCount(File file) {
 		long lineCount;
 		try (Stream<String> stream = Files.lines(file.toPath(), StandardCharsets.UTF_8)) {
-		  lineCount = stream.count();
-		} catch(Exception exp) {
+			lineCount = stream.count();
+		} catch (Exception exp) {
 			throw new RuntimeException(exp);
 		}
 		return lineCount;
 	}
-	
+
 	// * * *
 	//
 	// WRITE METHODS
@@ -277,7 +277,7 @@ public class FileUtil {
 		String name = prefix + str + "." + suffix;
 		return name;
 	}
-	
+
 	public static File createFileWithAppendedName(File srcFile, String str) {
 		File root = srcFile.getParentFile();
 		String prefix = FileUtil.getPrefix(srcFile);
@@ -286,7 +286,7 @@ public class FileUtil {
 		File file = new File(root, name);
 		return file;
 	}
-	
+
 	public static String getSuffix(String name) {
 		int start = name.lastIndexOf(".");
 		if (start < 0) {
@@ -328,8 +328,8 @@ public class FileUtil {
 		List<File> files = Arrays.asList(fileArray);
 		ArrayList<File> rtn = new ArrayList<File>();
 		files = sortByName(files);
-		for(File file: files) {
-			if(file.isDirectory()) {
+		for (File file : files) {
+			if (file.isDirectory()) {
 				rtn.add(file);
 			}
 		}
@@ -391,6 +391,19 @@ public class FileUtil {
 		File[] files = file.listFiles();
 		List<File> rtn = Arrays.asList(files);
 		rtn = sortByName(rtn);
+		return rtn;
+	}
+
+	public static List<File> listFilesOnly(File file) {
+		File[] files = file.listFiles();
+		List<File> list = Arrays.asList(files);
+		list = sortByName(list);
+		ArrayList<File> rtn = new ArrayList<File>();
+		for (File current : files) {
+			if (file.isDirectory() == false) {
+				rtn.add(current);
+			}
+		}
 		return rtn;
 	}
 
