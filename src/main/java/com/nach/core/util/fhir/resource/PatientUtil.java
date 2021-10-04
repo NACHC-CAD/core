@@ -47,7 +47,15 @@ public class PatientUtil {
 	public static String getSex(Patient patient) {
 		AdministrativeGender gender = patient.getGender();
 		if (gender != null) {
-			return gender.name();
+			String rtn = "";
+			String name = gender.name();
+			if("MALE".equalsIgnoreCase(name)) {
+				rtn = "M";
+			}
+			if("FEMALE".equalsIgnoreCase(name)) {
+				rtn = "F";
+			}
+			return rtn;
 		} else {
 			return "";
 		}
