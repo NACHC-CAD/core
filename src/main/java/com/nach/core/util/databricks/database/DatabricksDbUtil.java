@@ -123,12 +123,14 @@ public class DatabricksDbUtil {
 
 	public static void dropDatabase(String schemaName, Connection conn, DatabaseConnectionManager mgr) {
 		if (databaseExists(schemaName, conn, mgr) == true) {
+			/*
 			Data data = showTables(schemaName, conn);
 			for (Map<String, String> row : data) {
 				String tableName = row.get("tablename");
 				dropTable(schemaName, tableName, conn);
 			}
-			String sqlString = "drop database if exists " + schemaName;
+			*/
+			String sqlString = "drop database if exists " + schemaName + " cascade";
 			Database.update(sqlString, conn);
 			log.info("Done doing drop: " + schemaName);
 		}

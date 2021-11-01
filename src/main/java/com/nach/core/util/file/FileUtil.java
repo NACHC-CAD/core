@@ -287,6 +287,16 @@ public class FileUtil {
 		return file;
 	}
 
+	public static File createFileWithAppendedName(File srcFile, String dstDirPath, String str) {
+		File root = srcFile.getParentFile();
+		String prefix = FileUtil.getPrefix(srcFile);
+		String suffix = FileUtil.getSuffix(srcFile);
+		String name = prefix + str + "." + suffix;
+		File dstDir = mkdirs(root, dstDirPath);
+		File file = new File(dstDir, name);
+		return file;
+	}
+
 	public static String getSuffix(String name) {
 		int start = name.lastIndexOf(".");
 		if (start < 0) {
