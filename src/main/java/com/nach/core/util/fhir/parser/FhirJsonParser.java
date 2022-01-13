@@ -1,11 +1,11 @@
-package com.nach.core.util.json;
+package com.nach.core.util.fhir.parser;
 
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 
-public class JsonParser {
+public class FhirJsonParser {
 
 	/**
 	 * Generate a class from a json string.
