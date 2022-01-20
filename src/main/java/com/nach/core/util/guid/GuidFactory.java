@@ -21,4 +21,8 @@ public class GuidFactory {
 		return rtn;
 	}
 	
+	public static void main(String[] args) {
+		System.out.println(getGuid());
+	}
+	
 }
