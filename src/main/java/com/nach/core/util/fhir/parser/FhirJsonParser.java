@@ -7,12 +7,13 @@ import ca.uhn.fhir.parser.IParser;
 
 public class FhirJsonParser {
 
+	private static FhirContext ctx = FhirContext.forDstu3();
+	
 	/**
 	 * Generate a class from a json string.
 	 */
 	public static <T extends IBaseResource> T parse(String jsonString, Class<T> cls) {
 		try {
-			FhirContext ctx = FhirContext.forDstu3();
 			IParser parser = ctx.newJsonParser();
 			parser.setStripVersionsFromReferences(false);
 			ctx.getParserOptions().setStripVersionsFromReferences(false);

@@ -46,7 +46,7 @@ public class OauthTokenFactory {
 			String response = client.getResponse();
 			response = JsonUtil.removeWhiteSpaces(response);
 			logger.info("Got response: \n" + response);
-			String rtn = new OAuthTokenResponseParser(response).getToken(response);
+			String rtn = new OAuthTokenResponseParser(response).getToken();
 			logger.debug("Done.");
 			return rtn;
 		} catch (Exception exp) {
@@ -78,7 +78,7 @@ public class OauthTokenFactory {
 			String response = client.getResponse();
 			response = JsonUtil.removeWhiteSpaces(response);
 			logger.info("Got response: \n" + response);
-			String rtn = new OAuthTokenResponseParser(response).getToken(response);
+			String rtn = new OAuthTokenResponseParser(response).getToken();
 			logger.debug("Done.");
 			return rtn;
 		} catch (Exception exp) {

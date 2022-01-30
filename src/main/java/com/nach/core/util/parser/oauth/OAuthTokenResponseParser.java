@@ -10,7 +10,7 @@ public class OAuthTokenResponseParser {
 		this.response = response;
 	}
 	
-	public String getToken(String response) {
+	public String getToken() {
 		try {
 			JSONObject responseObj = new JSONObject(response);
 			String rtn = responseObj.getString("access_token");
