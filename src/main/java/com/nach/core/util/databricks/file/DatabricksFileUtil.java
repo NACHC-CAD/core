@@ -297,17 +297,18 @@ public class DatabricksFileUtil {
 
 	public void writeLargeFile(String url, File target) {
 		FileOutputStream out = null;
+		DatabricksFileUtilResponse resp = null;
 		try {
 			out = new FileOutputStream(target);
 			boolean moreData = true;
 			int offset = 0;
 			int length = 1000000;
 			while (moreData) {
-				DatabricksFileUtilResponse resp = get(url, offset, length);
+				resp = get(url, offset, length);
 				Integer bytesRead = Integer.parseInt(resp.getBytesReadString());
 				offset += bytesRead;
-				log.info("\tBYTES READ: " + bytesRead);
-				log.info("TOTAL BYTES:  " + offset);
+				log.info("BYTES READ:  " + bytesRead);
+				log.info("TOTAL BYTES: " + offset);
 				InputStream in = resp.getInputStream();
 				writeLines(in, out);
 				if (bytesRead < length) {
