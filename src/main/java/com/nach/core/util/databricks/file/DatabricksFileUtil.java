@@ -308,8 +308,8 @@ public class DatabricksFileUtil {
 				offset += bytesRead;
 				log.info("\tBYTES READ: " + bytesRead);
 				log.info("TOTAL BYTES:  " + offset);
-				BufferedReader br = new BufferedReader(new InputStreamReader(resp.getInputStream()));
-				writeLines(br, out);
+				InputStream in = resp.getInputStream();
+				writeLines(in, out);
 				if (bytesRead < length) {
 					moreData = false;
 				}
@@ -327,15 +327,14 @@ public class DatabricksFileUtil {
 		}
 	}
 
-	private void writeLines(BufferedReader br, OutputStream out) {
+	private void writeLines(InputStream source, OutputStream target) {
 		try {
-			String line = br.readLine();
-			while (line != null) {
-				out.write(line.getBytes());
-				out.write(System.lineSeparator().getBytes());
-				line = br.readLine();
-			}
-		} catch (Exception exp) {
+		    byte[] buf = new byte[8192];
+		    int length;
+		    while ((length = source.read(buf)) > 0) {
+		        target.write(buf, 0, length);
+		    }
+		} catch(Exception exp) {
 			throw new RuntimeException(exp);
 		}
 	}
