@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -279,6 +280,34 @@ public class FileUtil {
 			FileUtils.copyInputStreamToFile(inputStream, file);
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
+		}
+	}
+
+	public static void writeLargeFile(InputStream is, File file) {
+		BufferedReader br = null;
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(file);
+			br = new BufferedReader(new InputStreamReader(is));
+			String line = br.readLine();
+			int cnt = 0;
+			while (line != null) {
+				cnt++;
+				out.write(line.getBytes());
+				out.write(System.lineSeparator().getBytes());
+				line = br.readLine();
+			}
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		} finally {
+			if (br != null) {
+				try {
+					br.close();
+					out.close();
+				} catch (Exception exp) {
+					throw new RuntimeException(exp);
+				}
+			}
 		}
 	}
 

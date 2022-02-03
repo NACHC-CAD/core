@@ -49,6 +49,8 @@ public class DatabricksFileUtilResponse {
 	
 	private boolean fileExists = false;
 	
+	private String bytesReadString;
+	
 	public void init(HttpRequestClient client, File file, Timer timer, String databricksFilePath) {
 		init(client);
 		init(file);
@@ -92,4 +94,6 @@ public class DatabricksFileUtilResponse {
 		byte[] bytes = Base64.decodeBase64(data);
 		this.inputStream = new ByteArrayInputStream(bytes);
 	}
+	
+	
 }

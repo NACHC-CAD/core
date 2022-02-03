@@ -1,8 +1,12 @@
 package com.nach.core.util.databricks.file;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,17 +82,17 @@ public class DatabricksFileUtil {
 	}
 
 	public List<String> listFileNames(String dirPath) {
-		ArrayList<String> rtn = new ArrayList<String> ();
+		ArrayList<String> rtn = new ArrayList<String>();
 		String json = list(dirPath);
 		List<String> files = JsonUtil.getJsonArray(json, "files");
-		for(String fileJson : files) {
+		for (String fileJson : files) {
 			String path = JsonUtil.getString(fileJson, "path");
 			path = path.substring(path.lastIndexOf("/") + 1, path.length());
 			rtn.add(path);
 		}
 		return rtn;
 	}
-	
+
 	/**
 	 * 
 	 * Method to put a file on the server. The filePath is the path with out the
@@ -128,7 +132,7 @@ public class DatabricksFileUtil {
 		resp.setUrl(this.baseUrl);
 		return resp;
 	}
-	
+
 	/**
 	 * 
 	 * Put a file on the server. Replace existing file if replace if file exists on
@@ -262,13 +266,22 @@ public class DatabricksFileUtil {
 	 * 
 	 */
 	public DatabricksFileUtilResponse get(String filePath) {
+		return get(filePath, null, null);
+	}
+
+	public DatabricksFileUtilResponse get(String filePath, Integer offset, Integer length) {
 		Timer timer = new Timer();
 		timer.start();
 		String url = baseUrl + "/dbfs/read";
 		url += "?path=" + filePath;
+		if (offset != null && length != null) {
+			url += "&offset=" + offset;
+			url += "&length=" + length;
+		}
 		HttpRequestClient client = new HttpRequestClient(url);
 		client.setOauthToken(token);
-		String json = "{\"path\":\"" + filePath + "\"}";
+		// String json = "{\"path\":\"" + filePath + "\"}";
+		log.info("URL: \n" + client.getUrl());
 		client.doGet();
 		timer.stop();
 		DatabricksFileUtilResponse rtn = new DatabricksFileUtilResponse();
@@ -276,8 +289,55 @@ public class DatabricksFileUtil {
 		if (rtn.isSuccess()) {
 			String data = JsonUtil.getString(rtn.getResponse(), "data");
 			rtn.initInputStreamFromBase64String(data);
+			String bytesRead = JsonUtil.getString(rtn.getResponse(), "bytes_read");
+			rtn.setBytesReadString(bytesRead);
 		}
 		return rtn;
+	}
+
+	public void writeLargeFile(String url, File target) {
+		FileOutputStream out = null;
+		try {
+			out = new FileOutputStream(target);
+			boolean moreData = true;
+			int offset = 0;
+			int length = 1000000;
+			while (moreData) {
+				DatabricksFileUtilResponse resp = get(url, offset, length);
+				Integer bytesRead = Integer.parseInt(resp.getBytesReadString());
+				offset += bytesRead;
+				log.info("\tBYTES READ: " + bytesRead);
+				log.info("TOTAL BYTES:  " + offset);
+				BufferedReader br = new BufferedReader(new InputStreamReader(resp.getInputStream()));
+				writeLines(br, out);
+				if (bytesRead < length) {
+					moreData = false;
+				}
+			}
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		} finally {
+			if (out != null) {
+				try {
+					out.close();
+				} catch (Exception exp) {
+					throw new RuntimeException(exp);
+				}
+			}
+		}
+	}
+
+	private void writeLines(BufferedReader br, OutputStream out) {
+		try {
+			String line = br.readLine();
+			while (line != null) {
+				out.write(line.getBytes());
+				out.write(System.lineSeparator().getBytes());
+				line = br.readLine();
+			}
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
 	}
 
 }
