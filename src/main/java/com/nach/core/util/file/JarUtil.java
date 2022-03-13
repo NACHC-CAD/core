@@ -26,7 +26,7 @@ public class JarUtil {
 					}
 					String name = "/" + entry.getName();
 					log.info("NAME: " + name);
-					if (name.startsWith(path)) {
+					if (name.startsWith(path) && name.equals(path) == false) {
 						rtn.add(name);
 					}
 				}
