@@ -4,11 +4,11 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -113,7 +113,7 @@ public class FileUtil {
 			rtn.add(str);
 			while (str != null) {
 				str = reader.readLine();
-				if(str != null) {
+				if (str != null) {
 					str = str.trim();
 					rtn.add(str);
 				}
@@ -128,7 +128,7 @@ public class FileUtil {
 
 	public static void closeReader(Reader reader) {
 		try {
-			if(reader != null) {
+			if (reader != null) {
 				reader.close();
 			}
 		} catch (Exception exp) {
@@ -594,6 +594,33 @@ public class FileUtil {
 			out.close();
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
+		}
+	}
+
+	//
+	// get package listing from a jar file
+	//
+
+	public static List<String> listResources(String path, Class cls) {
+		log.info("--- none of these should be null");
+		log.info("path: " + path);
+		URL url = FileUtil.class.getResource(".");
+		log.info("url: " + url);
+		log.info(FileUtil.class.getResource("") + "");
+		log.info(FileUtil.class.getResource(".") + "");
+		log.info(FileUtil.class.getResource("/") + "");
+		log.info(FileUtil.class.getResource("./") + "");
+		log.info(FileUtil.class.getResource("/com") + "");
+		log.info(FileUtil.class.getResource(path) + "");
+		log.info("--- end not nulls");
+		String name = FileUtil.class.getResource(path) + "";
+		log.info("NAME: " + name);
+		if(name.startsWith("jar:")) {
+			log.info("Doing jar method");
+			return JarUtil.getFiles(path, cls);
+		} else {
+			log.info("Doing not jar method");
+			return NotJarUtil.getResources(path);
 		}
 	}
 
