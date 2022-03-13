@@ -602,24 +602,13 @@ public class FileUtil {
 	//
 
 	public static List<String> listResources(String path, Class cls) {
-		log.info("--- none of these should be null");
-		log.info("path: " + path);
-		URL url = FileUtil.class.getResource(".");
-		log.info("url: " + url);
-		log.info(FileUtil.class.getResource("") + "");
-		log.info(FileUtil.class.getResource(".") + "");
-		log.info(FileUtil.class.getResource("/") + "");
-		log.info(FileUtil.class.getResource("./") + "");
-		log.info(FileUtil.class.getResource("/com") + "");
-		log.info(FileUtil.class.getResource(path) + "");
-		log.info("--- end not nulls");
 		String name = FileUtil.class.getResource(path) + "";
-		log.info("NAME: " + name);
+		log.debug("NAME: " + name);
 		if(name.startsWith("jar:")) {
-			log.info("Doing jar method");
+			log.debug("Doing jar method");
 			return JarUtil.getFiles(path, cls);
 		} else {
-			log.info("Doing not jar method");
+			log.debug("Doing not jar method");
 			return NotJarUtil.getResources(path);
 		}
 	}

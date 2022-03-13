@@ -25,8 +25,10 @@ public class JarUtil {
 						break;
 					}
 					String name = "/" + entry.getName();
-					log.info("NAME: " + name);
-					if (name.startsWith(path) && name.equals(path) == false) {
+					if (name.startsWith(path) && name.equals(path + "/") == false && name.equals(path) == false) {
+						log.debug("-----------------");
+						log.debug("NAME: " + name);
+						log.debug("PATH: " + path);
 						rtn.add(name);
 					}
 				}
