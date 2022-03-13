@@ -24,8 +24,11 @@ public class NotJarUtil {
 				InputStream in = getResourceAsStream(path);
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			String resource;
-
 			while ((resource = br.readLine()) != null) {
+				if(path.endsWith("/") == false && resource.startsWith("/") == false) {
+					path = path + "/";
+				}
+				resource = path + resource;
 				filenames.add(resource);
 			}
 		}
