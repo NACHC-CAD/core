@@ -6,7 +6,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>0.0.11-SNAPSHOT</version>
+		<version>0.0.10</version>
 	</properties>
 
 	<groupId>org.nachc.cad.tools</groupId>
@@ -296,7 +296,94 @@
 				  </configuration>
 			</plugin>
 
+			<!-- 
+			*
+			* Generate sources and java docs (required for mvn distribution) 
+			*
+			* -->
+			
+			<!-- source -->
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-source-plugin</artifactId>
+			  <version>2.2.1</version>
+			  <executions>
+			    <execution>
+			      <id>attach-sources</id>
+			      <goals>
+			        <goal>jar-no-fork</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+			</plugin>
+			<!-- javadoc -->
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-javadoc-plugin</artifactId>
+			  <version>2.9.1</version>
+			  <executions>
+			    <execution>
+			      <id>attach-javadocs</id>
+			      <goals>
+			        <goal>jar</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+			</plugin>
+	
+			<!-- 
+			*
+			* MVN Distribution
+			* (see https://central.sonatype.org/publish/publish-maven/ for details)
+			*
+			* -->
+	
+			<!-- staging -->
+		    <plugin>
+		      <groupId>org.sonatype.plugins</groupId>
+		      <artifactId>nexus-staging-maven-plugin</artifactId>
+		      <version>1.6.7</version>
+		      <extensions>true</extensions>
+		      <configuration>
+		        <serverId>ossrh</serverId>
+		        <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+		        <autoReleaseAfterClose>true</autoReleaseAfterClose>
+		      </configuration>
+		    </plugin>
+
+			<!-- certificate signing -->
+			<plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-gpg-plugin</artifactId>
+			  <version>1.5</version>
+			  <executions>
+			    <execution>
+			      <id>sign-artifacts</id>
+			      <phase>verify</phase>
+			      <goals>
+			        <goal>sign</goal>
+			      </goals>
+			    </execution>
+			  </executions>
+			</plugin>
+			
+			<plugin>
+			  <groupId>org.sonatype.plugins</groupId>
+			  <artifactId>nexus-staging-maven-plugin</artifactId>
+			  <version>1.6.7</version>
+			  <extensions>true</extensions>
+			  <configuration>
+			     <serverId>ossrh</serverId>
+			     <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+			     <autoReleaseAfterClose>true</autoReleaseAfterClose>
+			  </configuration>
+			</plugin>
+    
 		</plugins>
 	</build>
+
+
+
+
 
 </project>
