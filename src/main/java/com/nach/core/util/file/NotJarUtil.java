@@ -1,9 +1,8 @@
 package com.nach.core.util.file;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,22 +17,17 @@ public class NotJarUtil {
 	}
 	
 	private List<String> getResourceFiles(String path) throws IOException {
-		List<String> filenames = new ArrayList<>();
-
-		try (
-				InputStream in = getResourceAsStream(path);
-				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-			String resource;
-			while ((resource = br.readLine()) != null) {
-				if(path.endsWith("/") == false && resource.startsWith("/") == false) {
-					path = path + "/";
-				}
-				resource = path + resource;
-				filenames.add(resource);
-			}
+		List<String> fileNames = new ArrayList<>();
+		File dir = new File(path);
+		if(dir == null || dir.exists() == false) {
+			dir = FileUtil.getFile(path);
 		}
-		filenames.remove(path);
-		return filenames;
+		File[] files = dir.listFiles();
+		for(File file : files) {
+			String fileName = FileUtil.getCanonicalPath(file);
+			fileNames.add(fileName);
+		}
+		return fileNames;
 	}
 
 	private InputStream getResourceAsStream(String resource) {

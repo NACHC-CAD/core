@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -60,11 +59,23 @@ public class FileUtil {
 	}
 
 	public static String getCanonicalPath(String filePath) {
-		File file = getFile(filePath);
+		File file = getForLocalFile(filePath);
+		if (file == null) {
+			file = getFile(filePath);
+		}
 		try {
 			return file.getCanonicalPath();
 		} catch (Exception exp) {
 			throw new RuntimeException(exp);
+		}
+	}
+
+	public static File getForLocalFile(String filePath) {
+		File file = new File(filePath);
+		if (file != null && file.exists()) {
+			return file;
+		} else {
+			return null;
 		}
 	}
 
@@ -96,7 +107,13 @@ public class FileUtil {
 	 * "/com/mypackage/my-info.props".
 	 */
 	public static String getAsString(String filePath) {
-		InputStream is = FileUtil.class.getResourceAsStream(filePath);
+		InputStream is = null;
+		File file = getForLocalFile(filePath);
+		if(file != null && file.exists()) {
+			is = getInputStream(file);
+		} else {
+			is = FileUtil.class.getResourceAsStream(filePath);
+		}
 		return getAsString(is);
 	}
 
@@ -604,7 +621,7 @@ public class FileUtil {
 	public static List<String> listResources(String path, Class cls) {
 		String name = FileUtil.class.getResource(path) + "";
 		log.debug("NAME: " + name);
-		if(name.startsWith("jar:")) {
+		if (name.startsWith("jar:")) {
 			log.debug("Doing jar method");
 			return JarUtil.getFiles(path, cls);
 		} else {
