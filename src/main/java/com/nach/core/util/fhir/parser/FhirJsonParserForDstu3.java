@@ -1,36 +1,16 @@
 package com.nach.core.util.fhir.parser;
 
-import java.io.File;
-
 import org.hl7.fhir.instance.model.api.IBaseResource;
-
-import com.nach.core.util.file.FileUtil;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class FhirJsonParser {
+public class FhirJsonParserForDstu3 {
 
 	private static final FhirContext CTX;
 
 	static {
-		File fhirContextFile = FileUtil.getFile("/fhir-context.txt");
-		if (fhirContextFile != null && fhirContextFile.exists()) {
-			String fhirContext = FileUtil.getAsString(fhirContextFile).trim();
-			if ("Dstu3".equals(fhirContext)) {
-				log.info("USING DSTU3 FOR FHIR PARSING");
-				CTX = FhirContext.forDstu3();
-			} else if ("R4".equals(fhirContext)) {
-				log.info("USING DSTU3 FOR FHIR PARSING");
-				CTX = FhirContext.forR4();
-			} else {
-				CTX = FhirContext.forDstu3();
-			}
-		} else {
-			CTX = FhirContext.forDstu3();
-		}
+		CTX = FhirContext.forDstu3();
 	}
 
 	/**
