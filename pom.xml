@@ -6,7 +6,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>0.1.001</version>
+		<version>0.1.002-SNAPSHOT</version>
 	</properties>
 
 	<groupId>org.nachc.cad.tools</groupId>
@@ -57,6 +57,13 @@
 
 	<dependencies>
 		
+		<!-- YAORMA FRAMEWORK STUFF -->
+		<dependency>
+			<groupId>org.nachc.cad.tools</groupId>
+			<artifactId>yaorma</artifactId>
+			<version>0.1.002-SNAPSHOT</version>
+		</dependency>
+	
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -64,13 +71,6 @@
             <scope>provided</scope>
         </dependency>
 
-		<!-- YAORMA FRAMEWORK STUFF -->
-		<dependency>
-			<groupId>org.nachc.cad.tools</groupId>
-			<artifactId>yaorma</artifactId>
-			<version>0.1.001</version>
-		</dependency>
-	
 		<!-- JUNIT https://mvnrepository.com/artifact/junit/junit -->
 		<dependency>
 			<groupId>junit</groupId>

@@ -23,7 +23,7 @@ public class FhirJsonParser {
 				log.info("USING DSTU3 FOR FHIR PARSING");
 				CTX = FhirContext.forDstu3();
 			} else if ("R4".equals(fhirContext)) {
-				log.info("USING DSTU3 FOR FHIR PARSING");
+				log.info("USING R4 FOR FHIR PARSING");
 				CTX = FhirContext.forR4();
 			} else {
 				CTX = FhirContext.forDstu3();
