@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -627,6 +628,20 @@ public class FileUtil {
 		} else {
 			log.debug("Doing not jar method");
 			return NotJarUtil.getResources(path);
+		}
+	}
+
+	public static List<String> listResources(File dir) {
+		try {
+			List<String> fileNames = new ArrayList<>();
+			File[] files = dir.listFiles();
+			for(File file : files) {
+				String fileName = FileUtil.getCanonicalPath(file);
+				fileNames.add(fileName);
+			}
+			return fileNames;
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
 		}
 	}
 

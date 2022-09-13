@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 public class FhirJsonParser {
 
 	private static final FhirContext CTX;
+	
+	private static final IParser PARSER;
 
 	static {
 		File fhirContextFile = FileUtil.getFile("/fhir-context.txt");
@@ -31,6 +33,7 @@ public class FhirJsonParser {
 		} else {
 			CTX = FhirContext.forDstu3();
 		}
+		PARSER = CTX.newJsonParser();
 	}
 
 	/**
@@ -49,4 +52,12 @@ public class FhirJsonParser {
 		}
 	}
 
+	/**
+	 * Generate a json string from a class.
+	 */
+	public static String serialize(IBaseResource resource) {
+		String rtn = PARSER.encodeResourceToString(resource);
+		return rtn;
+	}
+	
 }
