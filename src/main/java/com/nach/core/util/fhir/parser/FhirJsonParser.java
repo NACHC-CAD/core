@@ -31,6 +31,7 @@ public class FhirJsonParser {
 				CTX = FhirContext.forDstu3();
 			}
 		} else {
+			log.info("No file found at /fhir-context.txt, using DSTU3");
 			CTX = FhirContext.forDstu3();
 		}
 		PARSER = CTX.newJsonParser();
