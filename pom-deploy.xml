@@ -6,7 +6,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>1.0.005</version>
+		<version>1.1.009</version>
 	</properties>
 
 	<groupId>org.nachc.cad.tools</groupId>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.nachc.cad.tools</groupId>
 			<artifactId>yaorma</artifactId>
-			<version>1.0.004</version>
+			<version>1.1.009</version>
 		</dependency>
 
 		<!-- LOMBOK -->		
