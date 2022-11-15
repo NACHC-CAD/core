@@ -18,7 +18,13 @@ public class FhirJsonParser {
 	private static final IParser PARSER;
 
 	static {
+		log.info("Setting FHIR Context...");
 		File fhirContextFile = FileUtil.getFile("/fhir-context.txt");
+		log.info("FHIR CTX Config file found: " + fhirContextFile.exists());
+		if(fhirContextFile.exists() == true) {
+			log.info("Got context file...");
+			log.info("FHIR CTX FILE Location: " + FileUtil.getCanonicalPath(fhirContextFile));
+		}
 		if (fhirContextFile != null && fhirContextFile.exists()) {
 			String fhirContext = FileUtil.getAsString(fhirContextFile).trim();
 			if ("Dstu3".equals(fhirContext)) {
@@ -31,8 +37,8 @@ public class FhirJsonParser {
 				CTX = FhirContext.forDstu3();
 			}
 		} else {
-			log.info("No file found at /fhir-context.txt, using DSTU3");
-			CTX = FhirContext.forDstu3();
+			log.info("No file found at /fhir-context.txt, using R4");
+			CTX = FhirContext.forR4();
 		}
 		PARSER = CTX.newJsonParser();
 	}
