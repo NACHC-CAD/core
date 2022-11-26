@@ -13,15 +13,23 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FhirJsonParser {
 
-	private static final FhirContext CTX;
-	
-	private static final IParser PARSER;
+	private static FhirContext CTX;
+
+	private static IParser PARSER;
 
 	static {
+		String msg;
+		msg = "\n";
+		msg += "***************************\n";
+		msg += "*\n";
+		msg += "* SETTING FHIR CONTEXT\n";
+		msg += "*\n";
+		msg += "***************************\n";
+		log.info(msg);
 		log.info("Setting FHIR Context...");
 		File fhirContextFile = FileUtil.getFile("/fhir-context.txt");
 		log.info("FHIR CTX Config file found: " + fhirContextFile.exists());
-		if(fhirContextFile.exists() == true) {
+		if (fhirContextFile.exists() == true) {
 			log.info("Got context file...");
 			log.info("FHIR CTX FILE Location: " + FileUtil.getCanonicalPath(fhirContextFile));
 		}
@@ -41,6 +49,26 @@ public class FhirJsonParser {
 			CTX = FhirContext.forR4();
 		}
 		PARSER = CTX.newJsonParser();
+		msg = "\n";
+		msg += "***************************\n";
+		msg += "*\n";
+		msg += "* DONE SETTING FHIR CONTEXT\n";
+		msg += "*\n";
+		msg += "***************************\n";
+		log.info(msg);
+	}
+
+	public static void setFhirContext(FhirContext context) {
+		CTX = context;
+		PARSER = CTX.newJsonParser();
+		String msg = "";
+		msg = "\n";
+		msg += "***************************\n";
+		msg += "*\n";
+		msg += "* MANUALLY SET FHIR CONTEXT TO: " + CTX + "\n";
+		msg += "*\n";
+		msg += "***************************\n";
+		log.info(msg);
 	}
 
 	/**
@@ -66,5 +94,5 @@ public class FhirJsonParser {
 		String rtn = PARSER.encodeResourceToString(resource);
 		return rtn;
 	}
-	
+
 }
