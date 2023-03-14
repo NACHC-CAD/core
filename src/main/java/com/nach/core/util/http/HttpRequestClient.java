@@ -120,6 +120,10 @@ public class HttpRequestClient {
 		this.statusCode = statusCode;
 	}
 
+	public InputStream getResponseInputStream() {
+		return this.responseInputStream;
+	}
+	
 	//
 	// headers and form data
 	//
