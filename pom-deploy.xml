@@ -6,7 +6,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>1.1.021</version>
+		<version>1.1.023</version>
 	</properties>
 
 	<groupId>org.nachc.cad.tools</groupId>
@@ -65,7 +65,7 @@
 		<dependency>
 			<groupId>org.nachc.cad.tools</groupId>
 			<artifactId>yaorma</artifactId>
-			<version>1.1.011</version>
+			<version>1.1.023</version>
 		</dependency>
 
 		<!-- LOMBOK -->		
@@ -173,6 +173,7 @@
 		</dependency>
 
 		<!-- HAPI -->
+		<!-- HAPI -->
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-structures-dstu3</artifactId>
@@ -181,24 +182,23 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-server</artifactId>
-			<version>6.1.1</version>
+	        <version>4.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-base</artifactId>
-			<version>6.1.1</version>
+	        <version>4.2.0</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-validation-resources-dstu3</artifactId>
-			<version>6.1.1</version>
+	        <version>4.2.0</version>
 		</dependency>
 	    <dependency>
 	        <groupId>ca.uhn.hapi.fhir</groupId>
 	        <artifactId>hapi-fhir-structures-r4</artifactId>
-	        <version>6.1.1</version>
+	        <version>4.2.0</version>
 	    </dependency>
-
 
 		<!-- JSOUP HTML Parser -->
 		<dependency>
@@ -300,7 +300,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.0</version>
 				<configuration>
-					<release>11</release>
+						<source>1.8</source>
+						<target>1.8</target>
 				</configuration>
 			</plugin>		
 
