@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -11,15 +12,24 @@ public class ZipUtil {
 
 	public static File unzip(File zipFile, File destDir) {
 		try {
+			FileInputStream fis = new FileInputStream(zipFile);
+			return unzip(fis, destDir);
+		} catch (Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+
+	public static File unzip(InputStream is, File destDir) {
+		try {
 			byte[] buffer = new byte[1024];
-			ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile));
+			ZipInputStream zis = new ZipInputStream(is);
 			ZipEntry zipEntry = zis.getNextEntry();
 			File rtn = null;
 			int cnt = 0;
 			while (zipEntry != null) {
 				cnt++;
 				File newFile = newFile(destDir, zipEntry);
-				if(cnt == 1) {
+				if (cnt == 1) {
 					rtn = newFile;
 				}
 				if (zipEntry.isDirectory()) {

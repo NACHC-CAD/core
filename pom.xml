@@ -6,7 +6,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<version>1.1.023</version>
+		<version>1.1.030</version>
 	</properties>
 
 	<groupId>org.nachc.cad.tools</groupId>
@@ -43,11 +43,27 @@
 	</scm>  
   
 	<distributionManagement>
-	  <snapshotRepository>
-	    <id>ossrh</id>
-	    <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-	  </snapshotRepository>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>		
 	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>bedatadriven</id>
+			<name>bedatadriven</name>
+			<url>https://nexus.bedatadriven.com/content/groups/public/</url>
+		</repository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</repositories>
 
 	<!-- 
 	*
@@ -177,22 +193,22 @@
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-server</artifactId>
-	        <version>4.2.0</version>
+	        <version>6.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-base</artifactId>
-	        <version>4.2.0</version>
+	        <version>6.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>ca.uhn.hapi.fhir</groupId>
 			<artifactId>hapi-fhir-validation-resources-dstu3</artifactId>
-	        <version>4.2.0</version>
+	        <version>6.1.1</version>
 		</dependency>
 	    <dependency>
 	        <groupId>ca.uhn.hapi.fhir</groupId>
 	        <artifactId>hapi-fhir-structures-r4</artifactId>
-	        <version>4.2.0</version>
+	        <version>6.1.1</version>
 	    </dependency>
 
 		<!-- JSOUP HTML Parser -->
