@@ -626,8 +626,16 @@ public class FileUtil {
 			log.debug("Doing jar method");
 			return JarUtil.getFiles(path, cls);
 		} else {
-			log.debug("Doing not jar method");
-			return NotJarUtil.getResources(path);
+			try {
+				log.debug("Doing not jar method");
+				return NotJarUtil.getResources(path);
+			} catch(Exception exp) {
+				try {
+					return JarUtil.getFiles(path, cls);
+				} catch(Exception exp2) {
+					throw new RuntimeException(exp);
+				}
+			}
 		}
 	}
 
