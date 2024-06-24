@@ -70,4 +70,13 @@ public class ZipUtil {
 		return destFile;
 	}
 
+	public static void createZip(File directoryToZip, File zipDir, String zipFileName) {
+		File file = new File(zipDir, zipFileName);
+		try {
+			ZipCreator.createZip(directoryToZip, file);
+		} catch(Exception exp) {
+			throw new RuntimeException(exp);
+		}
+	}
+	
 }
