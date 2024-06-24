@@ -72,6 +72,12 @@ public class ZipUtil {
 
 	public static void createZip(File directoryToZip, File zipDir, String zipFileName) {
 		File file = new File(zipDir, zipFileName);
+		if(file.exists()) {
+			boolean success = file.delete();
+			if(success == false) {
+				throw new RuntimeException("Could not deletfile: " + FileUtil.getCanonicalPath(file));
+			}
+		}
 		try {
 			ZipCreator.createZip(directoryToZip, file);
 		} catch(Exception exp) {
